@@ -18,7 +18,7 @@ class HTTPResponse extends ApplicationComponent {
 		exit($this->page->getGeneratedPage());
 	} 
 	public function setCookie($name = '',$expire = 0,$path = null,$domain = null,$secure = false,$httpOnly = true) {
-		setcookie($name,$expire,$path,$domain,$secure,$httpOnly) 
+		setcookie($name,$expire,$path,$domain,$secure,$httpOnly);
 	} 
 	public function setPage($page) {
 		$this->page = $page;

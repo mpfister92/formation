@@ -2,7 +2,8 @@
 namespace OCFram;
 
 class Router {
-	protected $_routes = [];
+    const NO_ROUTE = 1;
+    protected $_routes = [];
 
 	public function addRoute(Route $route) {
 		if (!in_array($route,$this->_routes)) {
@@ -25,7 +26,7 @@ class Router {
 					//Création du tableau comportant les noms/variables des variables
 					$arrayVars = [];
 					//parcours de l'ensemble des variables de la route
-					foreach($varsNames as $key => $value) {
+					foreach($varsValue as $key => $value) {
 						if ($key !== 0) {
 							$arrayVars[$varsNames[$key - 1]] = $value;
 						}

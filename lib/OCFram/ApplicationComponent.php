@@ -9,7 +9,7 @@ abstract class ApplicationComponent {
 	}
 
 	public function app() {
-		return this->_app;
+		return $this->_app;
 	}
 }
 ?>

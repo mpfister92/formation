@@ -20,7 +20,7 @@ class Route {
 	}
 
 	public function match($url) {
-		if preg_match('^'.$this->_url.'$',$url,$matches) {
+		if (preg_match('^'.$this->_url.'$',$url,$matches)) {
 			return $matches;
 		}
 		return false;	
@@ -65,11 +65,12 @@ class Route {
 	} 
 
 	public function varsNames() {
-		return $this->_varNames;
+		return $this->_varsNames;
 	} 
 
 	public function vars() {
 		return $this->_vars;
-	} 
+	}
+
 }
 ?>
