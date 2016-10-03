@@ -11,10 +11,10 @@ namespace Entity;
 use \OCFram\Entity;
 
 class Comment extends Entity {
-    protected $_news;
-    protected $_auteur;
-    protected $_contenu;
-    protected $_date;
+    protected $_news,
+            $_auteur,
+            $_contenu,
+            $_date;
 
     const AUTEUR_INVALIDE = 1;
     const TEXT_INVALIDE = 2;

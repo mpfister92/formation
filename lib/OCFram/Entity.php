@@ -10,21 +10,14 @@ namespace OCFram;
 
 
 abstract class Entity implements \ArrayAccess {
+    use Hydrator;
+
     protected $_errors = [];
     protected $_id;
 
     public function __construct(array $data = []){
         if(!empty($data)){
             $this->hydrate($data);
-        }
-    }
-
-    public function hydrate(array $data) {
-        foreach($data as $attribute => $value){
-            $method = 'set'.ucfirst($attribute);
-            if (is_callable([$this,$method])){
-                $this->$method($value);
-            }
         }
     }
 
