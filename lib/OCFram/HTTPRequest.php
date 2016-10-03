@@ -28,7 +28,7 @@ class HTTPRequest extends ApplicationComponent {
 	}
 
 	public function postData($key) {
-		if (isset($_POST[$key])
+		if (isset($_POST[$key]))
 			return $_POST[$key];
 		else 
 			return null;

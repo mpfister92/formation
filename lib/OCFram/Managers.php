@@ -20,10 +20,10 @@ class Managers extends Manager {
 
     public function getManagerOf($module) {
         if(!is_string($module)){
-            throw new Exception('Erreur dans le paramètre');
+            throw new \InvalidArgumentException('Erreur dans le paramètre');
         }
         //si le manager n'existe pas on le crée
-        if(!isset($this->_managers[$module]){
+        if(!isset($this->_managers[$module])){
             $manager = '\\Model\\'.$module.'Manager'.$this->_api;
             $this->_managers[$module] = new $manager($this->_dao);
         }

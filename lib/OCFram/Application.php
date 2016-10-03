@@ -1,22 +1,28 @@
 <?php
 namespace OCFram;
 
+
+
 abstract class Application {
 	protected $_httpRequest;
 	protected $_httpResponse;
 	protected $_name;
+	protected $_user;
+	protected $_config;
 
 	public function __construct() {
-		$this->_httpRequest = new HTTPRequest;
-		$this->_httpResponse = new HTTPResponse;
-		$this->name = '';
+		$this->_httpRequest = new HTTPRequest($this->_httpRequest->app());
+		$this->_httpResponse = new HTTPResponse($this->_httpRequest->app());
+		$this->_name = '';
+		$this->_user = new User($this->user()->app());
+		$this->_config = new Config($this->config()->app());
 	}
 
 	public function getController() {
 	    $router = new Router;
 
 	    $xml = new \DOMDocument;
-	    $xml->load(__DIR__.'/../../App/'.$this->name.'/Config/routes.xml');
+	    $xml->load(__DIR__.'/../../App/'.$this->_name.'/Config/routes.xml');
 
 	    $routes = $xml->getElementsByTagName('route');
 
@@ -35,12 +41,12 @@ abstract class Application {
 
 	    try {
 	      	// On récupère la route correspondante à l'URL.
-	      	$matchedRoute = $router->getRoute($this->httpRequest->requestURI());
+	      	$matchedRoute = $router->getRoute($this->_httpRequest->requestURI());
 	    }
 	    catch (\RuntimeException $e) {
 		    if ($e->getCode() == Router::NO_ROUTE) {
 	        	// Si aucune route ne correspond, c'est que la page demandée n'existe pas.
-	        	$this->httpResponse->redirect404();
+	        	$this->_httpResponse->redirect404();
 	      	}
 	    }
 
@@ -48,7 +54,7 @@ abstract class Application {
 	    $_GET = array_merge($_GET, $matchedRoute->vars());
 
 	    // On instancie le contrôleur.
-	    $controllerClass = 'App\\'.$this->name.'\\Modules\\'.$matchedRoute->module().'\\'.$matchedRoute->module().'Controller';
+	    $controllerClass = 'App\\'.$this->_name.'\\Modules\\'.$matchedRoute->module().'\\'.$matchedRoute->module().'Controller';
 	    return new $controllerClass($this, $matchedRoute->module(), $matchedRoute->action());
   	}
 
@@ -64,6 +70,14 @@ abstract class Application {
 
 	public function name() {
 		return $this->_name;
+	}
+
+	public function user(){
+		return $this->_user;
+	}
+
+	public function config(){
+		return $this->_config;
 	}
 }
 ?> 

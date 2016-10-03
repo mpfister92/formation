@@ -37,7 +37,7 @@ class Router {
 			}
 		}
 		//si on ne capture aucune chaine on lance une exception
-		throw new Exception('Aucune route trouvée');
+		throw new \Exception('Aucune route trouvée');
 	}
 }
 ?>

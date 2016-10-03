@@ -6,7 +6,7 @@ abstract class BackController extends ApplicationComponent {
 	protected $_module = '';
 	protected $_page = null;
 	protected $_view = '';
-	protected $managers = null;
+	protected $_managers = null;
 
 	public function __construct($app,$module,$action) {
 		parent::__construct($app);
@@ -15,16 +15,16 @@ abstract class BackController extends ApplicationComponent {
 		$this->setModule($module);
 		$this->setView($action);
 
-		$this->managers = new Managers('PDO',PDOFactory::getMysqlConnexion());
+		$this->_managers = new Managers('PDO',PDOFactory::getMysqlConnexion());
 	}
 
 	public function execute() {
 	    //ucfirst(str) : retourne str avec une maj en premier char
         //nom de la méthode à appeler
-        $methode = 'execute'.ucfirst($this->_action);
+        $method = 'execute'.ucfirst($this->_action);
         //vérifie si une variable peut être appelée comme fonction
         if (!is_callable([$this,$method])) {
-            throw new Exception('Erreur dans l\'appel de la méthode');
+            throw new \Exception('Erreur dans l\'appel de la méthode');
         }
         //appel de la méthode avec en parametre la request
         $this->$method($this->_app->httpRequest());
@@ -49,9 +49,12 @@ abstract class BackController extends ApplicationComponent {
     }
 
 	public function setView($view) {
-		if(is_string($view)) {
-            $this->_view = $view;
+		if(!is_string($view) || empty($view)) {
+            throw new \InvalidArgumentException('Erreur : nom de vue invalide');
         }
+        $this->_view = $view;
+
+        $this->_page->setContentFile(__DIR__.'/../../App/'.$this->_app->name().'/Modules/'.$this->_module.'/Views/'.$this->_view.'.php');
 	}
 }
 ?>

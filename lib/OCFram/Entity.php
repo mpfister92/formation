@@ -10,26 +10,26 @@ namespace OCFram;
 
 
 abstract class Entity implements \ArrayAccess {
-    protected $_erreurs = [];
+    protected $_errors = [];
     protected $_id;
 
-    public function __construct(array $donnees = []){
-        if(!empty($donnees)){
-            $this->hydrate($donnees);
+    public function __construct(array $data = []){
+        if(!empty($data)){
+            $this->hydrate($data);
         }
     }
 
-    public function hydrate(array $donnees) {
-        foreach($donnees as $attribut => $valeur){
-            $methode = 'set'.ucfirst($attribut);
-            if (is_callable([$this,$methode])){
-                $this->$methode($valeur);
+    public function hydrate(array $data) {
+        foreach($data as $attribute => $value){
+            $method = 'set'.ucfirst($attribute);
+            if (is_callable([$this,$method])){
+                $this->$method($value);
             }
         }
     }
 
-    public function erreurs() {
-        return $this->_erreurs;
+    public function errors() {
+        return $this->_errors;
     }
 
     public function id() {
@@ -46,13 +46,13 @@ abstract class Entity implements \ArrayAccess {
         return empty($this->_id);
     }
 
-    public function offsetExists($valeur){
-        return isset($this->$valeur) && is_callable([$this,$valeur]);
+    public function offsetExists($var){
+        return isset($this->$var) && is_callable([$this,$var]);
     }
 
-    public function offsetGet($valeur){
-        if (isset($this->$valeur) && is_callable([$this,$valeur])){
-            return $this->$valeur();
+    public function offsetGet($var){
+        if (isset($this->$var) && is_callable([$this,$var])){
+            return $this->$var();
         }
     }
 
@@ -63,8 +63,8 @@ abstract class Entity implements \ArrayAccess {
         }
     }
 
-    public function offsetUnset($valeur){
-        throw new Exception('Impossible de supprimer une valeur');
+    public function offsetUnset($var){
+        throw new \Exception('Impossible de supprimer une valeur');
     }
 }
 ?>
