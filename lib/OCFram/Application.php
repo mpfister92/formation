@@ -2,7 +2,6 @@
 namespace OCFram;
 
 
-
 abstract class Application {
 	protected $_httpRequest;
 	protected $_httpResponse;

@@ -56,7 +56,7 @@ class NewsController extends BackController {
     }
 
     public function executeInsertComment(HTTPRequest $request){
-        $this->_page->addVar('title','Ajoutd\'un commentaire');
+        $this->_page->addVar('title','Ajout d\'un commentaire');
 
         if($request->postExists('pseudo')) {
             $comment = new Comment([

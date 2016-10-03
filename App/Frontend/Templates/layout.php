@@ -1,9 +1,3 @@
-/**
- * Created by PhpStorm.
- * User: mpfister
- * Date: 03/10/2016
- * Time: 11:12
- */
 <!DOCTYPE html>
 <html>
   <head>

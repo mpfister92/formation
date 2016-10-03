@@ -56,7 +56,55 @@ class NewsManagerPDO extends NewsManager {
         }
 
         return null;
+    }
 
+    public function count(){
+        $sql = 'SELECT COUNT(*)
+                FROM News';
 
+        $requete = $this->_dao->query($sql);
+
+        $count = $requete->fetchColumn();
+        return $count;
+    }
+
+    public function add(News $news){
+        $sql = 'INSERT INTO News SET 
+                auteur = :auteur,
+                titre = :titre,
+                contenu = :contenu, 
+                dateAjout = NOW(),
+                dateModif = NOW()';
+
+        $request = $this->_dao->prepare($sql);
+        $request->bindValue(':auteur',$news->auteur());
+        $request->bindValue(':titre',$news->titre());
+        $request->bindValue(':contenu',$news->contenu());
+
+        $request->execute();
+    }
+
+    public function modify(News $news){
+        $sql = 'UPDATE News SET 
+                auteur = :auteur,
+                titre = :titre,
+                contenu = :contenu,
+                dateModif = NOW()
+                WHERE id = :id';
+
+        $request = $this->_dao->prepare($sql);
+        $request->bindValue(':auteur',$news->auteur());
+        $request->bindValue(':titre',$news->titre());
+        $request->bindValue(':contenu',$news->contenu());
+        $request->bindValue(':id',$news->id(),\PDO::PARAM_INT);
+
+        $request->execute();
+    }
+
+    public function delete($id){
+        $sql = 'DELETE FROM News
+                WHERE id = '.(int) $id;
+
+        $request = $this->_dao->exec($sql);
     }
 }

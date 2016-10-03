@@ -1,6 +1,7 @@
 <?php
 namespace OCFram;
 
+
 class HTTPResponse extends ApplicationComponent {
 	protected $_page;
 

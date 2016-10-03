@@ -12,6 +12,11 @@ use OCFram\Manager;
 
 abstract class CommentsManager extends Manager {
     abstract public function add(Comment $comment);
+    abstract public function getListOf($news);
+    abstract public function modify(Comment $comment);
+    abstract public function get($id);
+    abstract public function delete($id);
+    abstract public function deleteFromNews($news);
 
     public function save(Comment $comment){
         if($comment->isValid()){
@@ -23,9 +28,9 @@ abstract class CommentsManager extends Manager {
             }
         }
         else {
-            throw new \RuntimeException('Le commentoire doit être validé pour être enregistré');
+            throw new \RuntimeException('Le commentaire doit être validé pour être enregistré');
         }
     }
 
-    abstract public function getListOf($news);
+
 }
