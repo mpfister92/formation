@@ -39,7 +39,7 @@ class NewsController extends BackController
             ]);
 
             if ($request->getExists('id')) {
-                $news->setId($request->postData('id'));
+                $news->setId($request->getData('id'));
             }
         }
         else {

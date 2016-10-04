@@ -7,19 +7,18 @@
  */
 namespace OCFram;
 
-class Managers extends Manager {
-    protected $_api;
-    protected $_dao;
+class Managers {
+    protected $_api = null;
+    protected $_dao = null;
     protected $_managers = [];
 
     public function __construct($api,$dao) {
-        parent::__construct($dao);
         $this->_api = $api;
-        //$this->_dao = $dao;
+        $this->_dao = $dao;
     }
 
     public function getManagerOf($module) {
-        if(!is_string($module)){
+        if(!is_string($module) || empty($module)){
             throw new \InvalidArgumentException('Erreur dans le paramètre');
         }
         //si le manager n'existe pas on le crée

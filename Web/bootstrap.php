@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mpfister
- * Date: 03/10/2016
- * Time: 11:18
- */
 
 const DEFAULT_APP = 'Frontend';
 
@@ -36,4 +30,3 @@ $appClass = 'App\\'.$_GET['app'].'\\'.$_GET['app'].'Application';
 $app = new $appClass;
 $app->run();
 
-?>

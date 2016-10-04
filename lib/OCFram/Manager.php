@@ -9,7 +9,7 @@
 namespace OCFram;
 
 
-class Manager {
+abstract class Manager {
     protected $_dao;
 
     public function __construct($dao){

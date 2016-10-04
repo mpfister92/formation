@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mpfister
- * Date: 03/10/2016
- * Time: 10:42
- */
 
 namespace OCFram;
 

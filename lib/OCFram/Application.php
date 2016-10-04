@@ -10,11 +10,11 @@ abstract class Application {
 	protected $_config;
 
 	public function __construct() {
-		$this->_httpRequest = new HTTPRequest($this->_httpRequest->app());
-		$this->_httpResponse = new HTTPResponse($this->_httpRequest->app());
+		$this->_httpRequest = new HTTPRequest($this);
+		$this->_httpResponse = new HTTPResponse($this);
 		$this->_name = '';
-		$this->_user = new User($this->user()->app());
-		$this->_config = new Config($this->config()->app());
+		$this->_user = new User($this);
+		$this->_config = new Config($this);
 	}
 
 	public function getController() {
@@ -79,4 +79,4 @@ abstract class Application {
 		return $this->_config;
 	}
 }
-?> 
+?>
