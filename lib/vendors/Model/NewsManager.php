@@ -12,24 +12,35 @@ namespace Model;
 use OCFram\Manager;
 use \Entity\News;
 
-abstract class NewsManager extends Manager {
-    abstract public function getList($debut = -1,$limite = -1);
+abstract class NewsManager extends Manager
+{
+
+    /**
+     * @param int $debut
+     * @param int $limite
+     * @return News[]
+     */
+    abstract public function getList($debut = -1, $limite = -1);
+
     abstract public function getNews($id);
+
     abstract public function count();
-    abstract public function add(News $news);
-    abstract public function modify(News $news);
+
+    abstract protected function add(News $news);
+
+    abstract protected function modify(News $news);
+
     abstract public function delete($id);
 
-    public function save(News $news){
-        if($news->isValid()){
-            if($news->isNew()){
+    public function save(News $news)
+    {
+        if ($news->isValid()) {
+            if ($news->isNew()) {
                 $this->add($news);
-            }
-            else{
+            } else {
                 $this->modify($news);
             }
-        }
-        else {
+        } else {
             throw new \RuntimeException('La news doit être validée pour être enregistrée');
         }
     }

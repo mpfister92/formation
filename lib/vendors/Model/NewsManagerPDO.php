@@ -1,25 +1,21 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: mpfister
- * Date: 03/10/2016
- * Time: 12:36
- */
-
 namespace Model;
 
 use \Entity\News;
 
 class NewsManagerPDO extends NewsManager {
 
+    /**
+     * @param int $debut
+     * @param int $limite
+     * @return News[]
+     */
     public function getList($debut = -1,$limite = -1){
-        $sql = 'SELECT id,auteur,contenu,dateAjout,dateModif 
-                FROM News 
-                ORDER BY id DESC';
+        $sql = 'SELECT id,auteur,titre,contenu,dateAjout,dateModif FROM news  ORDER BY id DESC';
 
-        if($debut > -1 || $limite > -1){
-            $sql .='LIMIT '.(int) $limite.' OFFSET '.(int) $debut;
+        if($debut != -1 || $limite != -1){
+            $sql .=' LIMIT '.(int) $limite.' OFFSET '.(int) $debut;
         }
 
         $requete = $this->_dao->query($sql);
@@ -28,6 +24,7 @@ class NewsManagerPDO extends NewsManager {
         $listeNews = $requete->fetchAll();
 
         foreach($listeNews as $news){
+            date_default_timezone_set("Europe/Paris");
             $news->setDateAjout(new \DateTime($news->dateAjout()));
             $news->setDateModif(new \DateTime($news->dateModif()));
         }
@@ -38,8 +35,8 @@ class NewsManagerPDO extends NewsManager {
     }
 
     public function getNews($id){
-        $sql = 'SELECT id,auteur,contenu,dateAjout,dateModif
-                FROM News
+        $sql = 'SELECT id,auteur,titre,contenu,dateAjout,dateModif
+                FROM news
                 WHERE id = :id';
 
         $requete = $this->_dao->prepare($sql);
@@ -49,6 +46,7 @@ class NewsManagerPDO extends NewsManager {
         $requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\News');
 
         if($news = $requete->fetch()){
+            date_default_timezone_set("Europe/Paris");
             $news->setDateAjout(new \DateTime($news->dateAjout()));
             $news->setDateModif(new \DateTime($news->dateModif()));
 
@@ -60,7 +58,7 @@ class NewsManagerPDO extends NewsManager {
 
     public function count(){
         $sql = 'SELECT COUNT(*)
-                FROM News';
+                FROM news';
 
         $requete = $this->_dao->query($sql);
 
@@ -68,8 +66,8 @@ class NewsManagerPDO extends NewsManager {
         return $count;
     }
 
-    public function add(News $news){
-        $sql = 'INSERT INTO News SET 
+    protected function add(News $news){
+        $sql = 'INSERT INTO news SET 
                 auteur = :auteur,
                 titre = :titre,
                 contenu = :contenu, 
@@ -84,8 +82,8 @@ class NewsManagerPDO extends NewsManager {
         $request->execute();
     }
 
-    public function modify(News $news){
-        $sql = 'UPDATE News SET 
+    protected function modify(News $news){
+        $sql = 'UPDATE news SET 
                 auteur = :auteur,
                 titre = :titre,
                 contenu = :contenu,
@@ -102,7 +100,7 @@ class NewsManagerPDO extends NewsManager {
     }
 
     public function delete($id){
-        $sql = 'DELETE FROM News
+        $sql = 'DELETE FROM news
                 WHERE id = '.(int) $id;
 
         $request = $this->_dao->exec($sql);

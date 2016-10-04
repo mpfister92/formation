@@ -1,29 +1,26 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mpfister
- * Date: 03/10/2016
- * Time: 09:40
- */
 
 namespace OCFram;
 
 
-class Page extends ApplicationComponent {
+class Page extends ApplicationComponent
+{
     protected $_contentFile;
     protected $_vars = [];
 
-    public function addVar($var,$value) {
-        if(!is_string($var) || is_numeric($var) || empty($var)) {
+    public function addVar($var, $value)
+    {
+        if (!is_string($var) || is_numeric($var) || empty($var)) {
             throw new \InvalidArgumentException('Nom de variable incorrect');
         }
         $this->_vars[$var] = $value;
     }
 
-    public function getGeneratedPage() {
-        if(!file_exists($this->_contentFile)){
-            throw new \InvalidArgumentException('Erreur : la vue n\'existe pas');
-        }
+    public function getGeneratedPage()
+    {
+        /*if(!file_exists($this->_contentFile)){
+            throw new \RuntimeException('Erreur : la vue n\'existe pas');
+        }*/
 
         $user = $this->_app->user();
 
@@ -38,12 +35,13 @@ class Page extends ApplicationComponent {
         $content = ob_get_clean();
 
         ob_start();
-        require __DIR__.'/../../App/'.$this->_app->name().'/Templates/layout.php';
+        require __DIR__ . '/../../App/' . $this->_app->name() . '/Templates/layout.php';
         return ob_get_clean();
     }
 
-    public function setContentFile($contentFile) {
-        if(!is_string($contentFile) || empty($contentFile)){
+    public function setContentFile($contentFile)
+    {
+        if (!is_string($contentFile) || empty($contentFile)) {
             throw new \InvalidArgumentException('Erreur, vue invalide');
         }
         $this->_contentFile = $contentFile;

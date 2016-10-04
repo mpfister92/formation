@@ -11,67 +11,79 @@ namespace Entity;
 
 use \OCFram\Entity;
 
-class News extends Entity {
-    protected $_auteur,
-            $_titre,
-            $_contenu,
-            $_dateAjout,
-            $_dateModif;
+class News extends Entity
+{
+    protected $auteur,
+        $titre,
+        $contenu,
+        $dateAjout,
+        $dateModif;
 
     const AUTEUR_INVALIDE = 1;
     const TITRE_INVALIDE = 2;
     const CONTENU_INVALIDE = 3;
 
-    public function isValid(){
-        return !(empty($this->_auteur) || empty($this->_titre) || empty($this->_contenu));
+    public function isValid()
+    {
+        return !(empty($this->auteur) || empty($this->titre) || empty($this->contenu));
     }
 
-    public function setAuteur($auteur){
-        if(!is_string($auteur) || empty($auteur)){
-            $this->_errors[] = self::AUTEUR_INVALIDE;
+    public function setAuteur($auteur)
+    {
+        if (!is_string($auteur) || empty($auteur)) {
+            $this->errors[] = self::AUTEUR_INVALIDE;
         }
-        $this->_auteur = $auteur;
+        $this->auteur = $auteur;
     }
 
-    public function setTitre($titre){
-        if(!is_string($titre) || empty($titre)){
-            $this->_errors[] = self::TITRE_INVALIDE;
+    public function setTitre($titre)
+    {
+        if (!is_string($titre) || empty($titre)) {
+            $this->errors[] = self::TITRE_INVALIDE;
         }
-        $this->_titre = $titre;
+        $this->titre = $titre;
     }
 
-    public function setContenu($contenu){
-        if(!is_string($contenu) || empty($contenu)){
-            $this->_errors[] = self::CONTENU_INVALIDE;
+    public function setContenu($contenu)
+    {
+        if (!is_string($contenu) || empty($contenu)) {
+            $this->errors[] = self::CONTENU_INVALIDE;
         }
-        $this->_contenu = $contenu;
+        $this->contenu = $contenu;
     }
 
-    public function setDateAjout(\DateTime $dateajout){
-        $this->_dateAjout = $dateajout;
+    public function setDateAjout(\DateTime $dateajout)
+    {
+        $this->dateAjout = $dateajout;
     }
 
-    public function setDateModif(\DateTime $datemodif){
-        $this->_dateModif = $datemodif;
+    public function setDateModif(\DateTime $datemodif)
+    {
+        $this->dateModif = $datemodif;
     }
 
-    public function auteur(){
-        return $this->_auteur;
+    public function auteur()
+    {
+        return $this->auteur;
     }
 
-    public function titre(){
-        return $this->_titre;
+    public function titre()
+    {
+        return $this->titre;
     }
 
-    public function contenu(){
-        return $this->_contenu;
+    public function contenu()
+    {
+        return $this->contenu;
     }
 
-    public function dateAjout(){
-        return $this->_dateAjout;
+    public function dateAjout()
+    {
+        return $this->dateAjout;
     }
 
-    public function dateModif(){
-        return $this->_dateModif;
+    public function dateModif()
+    {
+        return $this->dateModif;
     }
 }

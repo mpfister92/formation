@@ -10,57 +10,67 @@ namespace Entity;
 
 use \OCFram\Entity;
 
-class Comment extends Entity {
-    protected $_news,
-            $_auteur,
-            $_contenu,
-            $_date;
+class Comment extends Entity
+{
+    protected $news,
+        $auteur,
+        $contenu,
+        $date;
 
     const AUTEUR_INVALIDE = 1;
     const TEXT_INVALIDE = 2;
 
-    public function isValid(){
-        return !(empty($this->_auteur) || empty($this->_contenu));
+    public function isValid()
+    {
+        return !(empty($this->auteur) || empty($this->contenu));
     }
 
-    public function setNews($news){
-        if(!empty($news)) {
-            $this->_news = (int) $news;
+    public function setNews($news)
+    {
+        if (!empty($news)) {
+            $this->news = (int)$news;
         }
     }
 
-    public function setAuteur($auteur){
-        if(!is_string($auteur) || empty($auteur)){
-            $this->_errors[] = self::AUTEUR_INVALIDE;
+    public function setAuteur($auteur)
+    {
+        if (!is_string($auteur) || empty($auteur)) {
+            $this->errors[] = self::AUTEUR_INVALIDE;
         }
-        $this->_auteur = $auteur;
+        $this->auteur = $auteur;
     }
 
-    public function setText($contenu){
-        if(!is_string($contenu) || empty($contenu)){
-            $this->_errors[] = self::TEXT_INVALIDE;
+    public function setText($contenu)
+    {
+        if (!is_string($contenu) || empty($contenu)) {
+            $this->errors[] = self::TEXT_INVALIDE;
         }
-        $this->_contenu= $contenu;
+        $this->contenu = $contenu;
     }
 
-    public function setDate(\DateTime $date){
-        $this->_date = $date;
+    public function setDate(\DateTime $date)
+    {
+        $this->date = $date;
     }
 
-    public function news() {
-        return $this->_news;
+    public function news()
+    {
+        return $this->news;
     }
 
-    public function auteur(){
-        return $this->_auteur;
+    public function auteur()
+    {
+        return $this->auteur;
     }
 
-    public function contenu(){
-        return $this->_contenu;
+    public function contenu()
+    {
+        return $this->contenu;
     }
 
-    public function date(){
-        return $this->_date;
+    public function date()
+    {
+        return $this->date;
     }
 
 }

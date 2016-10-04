@@ -3,22 +3,25 @@
 namespace OCFram;
 
 
-
-abstract class Validator {
+abstract class Validator
+{
     protected $_errorMessage;
 
-    public function __construct($errorMessage){
+    public function __construct($errorMessage)
+    {
         $this->setErrorMessage($errorMessage);
     }
 
     abstract public function isValid($value);
 
-    public function errorMessage(){
+    public function errorMessage()
+    {
         return $this->_errorMessage;
     }
 
-    public function setErrorMessage($errorMessage){
-        if(is_string($errorMessage)) {
+    public function setErrorMessage($errorMessage)
+    {
+        if (is_string($errorMessage)) {
             $this->_errorMessage = $errorMessage;
         }
     }
