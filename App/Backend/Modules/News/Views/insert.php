@@ -1,2 +1,8 @@
-<h2>Ajouter une vue</h2>
-<?php require '_form.php';
+<h2>Ajouter une news</h2>
+<form method="POST" action="">
+    <p>
+        <?= $form ?>
+
+        <input type="submit" value="Ajouter" />
+    </p>
+</form>

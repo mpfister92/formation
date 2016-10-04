@@ -12,9 +12,8 @@ namespace App\Frontend\Modules\News;
 use \OCFram\BackController;
 use \OCFram\HTTPRequest;
 use \Entity\Comment;
-use \OCFram\Form;
-use \OCFram\StringField;
-use \OCFram\TextField;
+use \FormBuilder\CommentFormBuilder;
+use \OCFram\FormHandler;
 
 class NewsController extends BackController {
 
@@ -72,22 +71,14 @@ class NewsController extends BackController {
             $comment = new Comment;
         }
 
-        $form = new Form($comment);
+        $formBuilder = new CommentFormBuilder($comment);
+        $formBuilder->build();
 
-        $form->add(new StringField([
-            'label' => 'Auteur',
-            'name' => 'auteur',
-            'maxLength' => 50
-        ]));
-        $form->add(new TextField([
-            'label' => 'Contenu',
-            'name' => 'contenu',
-            'rows' => 7,
-            'cols' => 50
-        ]));
+        $form = $formBuilder->form();
 
-        if($form->isValid()){
-            $this->_managers->getManagerOf('Comment')->save($comment);
+        $formHandler = new \OCFram\FormHandler($form,$this->_managers->getManagerOf('Comment'),$request);
+
+        if($formHandler->process()){
             $this->_app->user()->setFlash('Le commentaire a bien été ajouté, merci !');
             $this->_app->httpResponse()->redirect('news-' . $request->getData('news') . '.html');
         }
@@ -97,5 +88,6 @@ class NewsController extends BackController {
 
         $this->_page->addVar('title','Ajout d\'un commentaire');
         $this->_page->addVar('comment', $comment);
+        $this->_page->addVar('form',$form->createView());
     }
 }
