@@ -9,3 +9,9 @@ if ( !empty( $listeNews ) ) {
 		<?php
 	}
 }
+
+else {
+	?>
+	<h2>Aucune news pour le moment !</h2>
+	<?php
+}

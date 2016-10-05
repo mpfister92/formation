@@ -27,9 +27,7 @@ class Comment extends Entity
 
     public function setNews($news)
     {
-        if (!empty($news)) {
-            $this->news = (int)$news;
-        }
+		$this->news = (int) $news;
     }
 
     public function setAuteur($auteur)
@@ -40,7 +38,7 @@ class Comment extends Entity
         $this->auteur = $auteur;
     }
 
-    public function setText($contenu)
+    public function setContenu($contenu)
     {
         if (!is_string($contenu) || empty($contenu)) {
             $this->errors[] = self::TEXT_INVALIDE;

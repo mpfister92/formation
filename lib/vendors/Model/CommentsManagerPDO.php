@@ -27,13 +27,13 @@ class CommentsManagerPDO extends CommentsManager
         $requete->bindValue(':contenu', $comment->contenu());
 
         $requete->execute();
-
+        
         $comment->setId($this->_dao->lastInsertId());
     }
 
     public function getListOf($news)
     {
-        $sql = 'SELECT auteur,contenu,date
+        $sql = 'SELECT news,auteur,contenu,date,id
                 FROM comments
                 WHERE news = :news';
 
@@ -55,16 +55,16 @@ class CommentsManagerPDO extends CommentsManager
 
     public function modify(Comment $comment)
     {
-        $sql = 'UPDATE FROM comments SET 
+        $sql = 'UPDATE comments SET 
                 auteur = :auteur,
-                contenu = :contenu,
+                contenu = :contenu
                 WHERE id = :id';
 
         $request = $this->_dao->prepare($sql);
         $request->bindValue(':auteur', $comment->auteur());
         $request->bindValue(':contenu', $comment->contenu());
-        $request->bindValue(':id', $comment->id());
-
+        $request->bindValue(':id', $comment->id(),\PDO::PARAM_INT);
+        
         $request->execute();
     }
 

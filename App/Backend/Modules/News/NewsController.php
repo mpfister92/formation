@@ -81,13 +81,13 @@ class NewsController extends BackController {
 		
 		if ( $request->method() == 'POST' ) {
 			$comment = new Comment( [
-				'news'    => $request->getData( 'id' ),
-				'auteur'  => $request->postData( 'pseudo' ),
+				'id'      => $request->getData( 'id' ),
+				'auteur'  => $request->postData( 'auteur' ),
 				'contenu' => $request->postData( 'contenu' ),
 			] );
 		}
 		else {
-			$comment = $this->_page->addVar( 'comment', $this->_managers->getManagerOf( 'Comments' )->get( $request->getData( 'id' ) ) );
+			$comment = $this->_managers->getManagerOf( 'Comments' )->get( $request->getData( 'id' ) );
 		}
 		
 		$formBuilder = new CommentFormBuilder( $comment );
@@ -95,11 +95,11 @@ class NewsController extends BackController {
 		
 		$form = $formBuilder->form();
 		
-		$formHandler = new \OCFram\FormHandler( $form, $this->_managers->getManagerOf( 'Comments' ), $request );
+		$formHandler = new FormHandler( $form, $this->_managers->getManagerOf( 'Comments' ), $request );
 		
 		if ( $formHandler->process() ) {
 			$this->_app->user()->setFlash( 'Le commentaire a bien été modifié !' );
-			$this->_app->httpResponse()->redirect( '/news-' . $request->postData( 'news' ) . '.html' );
+			$this->_app->httpResponse()->redirect( '/admin/' );
 		}
 		$this->_page->addVar( 'form', $form->createView() );
 	}
