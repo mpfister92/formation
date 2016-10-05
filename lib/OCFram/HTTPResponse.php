@@ -18,7 +18,7 @@ class HTTPResponse extends ApplicationComponent {
 		//création d'une instance de la classe page
 		$this->_page = new Page( $this->_app );
 		//assignation du fichier qui fait office de vue à générer
-		$this->_page->setContentFile( __DIR__ . '/../../App/Errors/404.php' );
+		$this->_page->setContentFile( __DIR__ . '/../../Errors/404.html' );
 		//ajout d'un header
 		$this->addHeader( 'HTTP/1.0 404 Not Found' );
 		//envoie de la réponse

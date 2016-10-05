@@ -26,7 +26,7 @@
 						<li><a href="/admin/deconnexion.html">Deconnexion</a></li>
 					<?php }
 					else { ?>
-						<li><a href="/admin/">Connexion Administration</a></li>
+						<li><a href="/admin/">Connexion Admin</a></li>
 					<?php } ?>
 				</ul>
 			</nav>
