@@ -1,2 +1,12 @@
-"require": {
-	
+{
+  "name": "mobiledetect/composer",
+  "require": {
+	"mobiledetect/mobiledetectlib": "^2.8"
+  },
+  "authors": [
+	{
+	  "name": "Pfister Morgan",
+	  "email": "m.pfister@dreamcentury.com"
+	}
+  ]
+}
