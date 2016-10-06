@@ -8,7 +8,9 @@
 	</p>
 <?php } ?>
 
+
 <p><a href="commenter-<?= $news[ 'id' ] ?>.html">Ajouter un commentaire</a></p>
+
 
 <?php
 if ( empty( $comments ) ) {
@@ -16,6 +18,7 @@ if ( empty( $comments ) ) {
 	<p>Aucun commentaire n'a encore été posté. Soyez le premier à en laisser un !</p>
 	<?php
 }
+
 
 foreach ( $comments as $comment ) {
 	?>

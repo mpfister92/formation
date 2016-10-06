@@ -12,7 +12,7 @@ abstract class FormBuilder
         $this->setForm(new Form($entity));
     }
 
-    abstract public function build();
+    abstract public function build(User $user = null, Manager $manager = null);
 
     public function form()
     {

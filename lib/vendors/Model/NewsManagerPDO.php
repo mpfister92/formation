@@ -6,22 +6,34 @@ use \Entity\News;
 
 class NewsManagerPDO extends NewsManager {
 
-    /**
+    /** retourne la liste des news pour un auteur $news
      * @param int $debut
      * @param int $limite
+	 * @param string $name
      * @return News[]
      */
-    public function getList($debut = -1,$limite = -1){
-        $sql = 'SELECT id,auteur,titre,contenu,dateAjout,dateModif FROM news  ORDER BY id DESC';
+    public function getList($debut = -1,$limite = -1,$name = null){
+        $sql = 'SELECT id,auteur,titre,contenu,dateAjout,dateModif 
+				FROM news';
 
+        if($name != null){
+        	$sql .= ' WHERE auteur = \'Morgan\'';
+		}
+        
         if($debut != -1 || $limite != -1){
-            $sql .=' LIMIT '.(int) $limite.' OFFSET '.(int) $debut;
+            $sql .=' LIMIT '.$limite.' OFFSET '.$debut;
         }
-
-        $requete = $this->_dao->query($sql);
+		
+        //var_dump($sql);
+        //die();
+        
+        $requete = $this->_dao->prepare($sql);
+        $requete->bindValue(':auteur',$name);
+        $requete->execute();
+        
         $requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\News');
-
-        $listeNews = $requete->fetchAll();
+	
+		$listeNews = $requete->fetchAll();
 
         foreach($listeNews as $news){
             date_default_timezone_set("Europe/Paris");
@@ -33,7 +45,12 @@ class NewsManagerPDO extends NewsManager {
 
         return $listeNews;
     }
-
+	
+	/** renvoie la news liée à l'id passé en paramètre
+	 * @param $id
+	 *
+	 * @return News
+	 */
     public function getNews($id){
         $sql = 'SELECT id,auteur,titre,contenu,dateAjout,dateModif
                 FROM news
@@ -55,17 +72,24 @@ class NewsManagerPDO extends NewsManager {
 
         return null;
     }
-
+	
+	/** retourne le nombre de news dans la base
+	 * @return int
+	 */
     public function count(){
         $sql = 'SELECT COUNT(*)
                 FROM news';
 
         $requete = $this->_dao->query($sql);
 
+        /** @var int $count */
         $count = $requete->fetchColumn();
         return $count;
     }
-
+	
+	/** ajoute une news dans la base
+	 * @param News $news
+	 */
     protected function add(News $news){
         $sql = 'INSERT INTO news SET 
                 auteur = :auteur,
@@ -81,7 +105,10 @@ class NewsManagerPDO extends NewsManager {
 
         $request->execute();
     }
-
+	
+	/** update une news de la base
+	 * @param News $news
+	 */
     protected function modify(News $news){
         $sql = 'UPDATE news SET 
                 auteur = :auteur,
@@ -98,11 +125,36 @@ class NewsManagerPDO extends NewsManager {
 
         $request->execute();
     }
-
+	
+	/** supprime une news de la base
+	 * @param $id
+	 */
     public function delete($id){
         $sql = 'DELETE FROM news
                 WHERE id = '.(int) $id;
 
         $request = $this->_dao->exec($sql);
     }
+	
+	
+	/** Retourne le nombre de news écrite apr l'auteur $name
+	 * @param string $name
+	 *
+	 * @return int
+	 */
+	public function countNewsForMember($name){
+		$sql = 'SELECT COUNT(*)
+				FROM news
+				WHERE auteur = :auteur';
+		
+		$requete = $this->_dao->prepare($sql);
+		
+		$requete->bindValue(':auteur',$name);
+		
+		$requete->execute();
+		
+		$count = $requete->fetchColumn();
+		
+		return $count;
+	}
 }

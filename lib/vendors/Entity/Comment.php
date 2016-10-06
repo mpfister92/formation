@@ -19,12 +19,17 @@ class Comment extends Entity
 
     const AUTEUR_INVALIDE = 1;
     const TEXT_INVALIDE = 2;
-
+	
+	/** retourne vrai si le commentaire est valide
+	 * @return bool
+	 */
     public function isValid()
     {
         return !(empty($this->auteur) || empty($this->contenu));
     }
 
+    /** SETTERS */
+    
     public function setNews($news)
     {
 		$this->news = (int) $news;
@@ -51,6 +56,8 @@ class Comment extends Entity
         $this->date = $date;
     }
 
+    /** GETTERS */
+    
     public function news()
     {
         return $this->news;

@@ -22,12 +22,17 @@ class News extends Entity
     const AUTEUR_INVALIDE = 1;
     const TITRE_INVALIDE = 2;
     const CONTENU_INVALIDE = 3;
-
+	
+	/** renvoie vrai si la news est valide
+	 * @return bool
+	 */
     public function isValid()
     {
         return !(empty($this->auteur) || empty($this->titre) || empty($this->contenu));
     }
 
+    /** SETTERS */
+    
     public function setAuteur($auteur)
     {
         if (!is_string($auteur) || empty($auteur)) {
@@ -62,6 +67,8 @@ class News extends Entity
         $this->dateModif = $datemodif;
     }
 
+    /** GETTERS */
+    
     public function auteur()
     {
         return $this->auteur;

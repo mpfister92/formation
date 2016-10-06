@@ -13,6 +13,9 @@ use \Entity\Comment;
 
 class CommentsManagerPDO extends CommentsManager
 {
+	/** ajoute un commentaire dans la base
+	 * @param Comment $comment
+	 */
     protected function add(Comment $comment)
     {
         $sql = 'INSERT INTO comments SET 
@@ -30,7 +33,12 @@ class CommentsManagerPDO extends CommentsManager
         
         $comment->setId($this->_dao->lastInsertId());
     }
-
+	
+	/** retourne la liste des commentaires pour une news
+	 * @param $news
+	 *
+	 * @return Comment[]
+	 */
     public function getListOf($news)
     {
         $sql = 'SELECT news,auteur,contenu,date,id
@@ -52,7 +60,10 @@ class CommentsManagerPDO extends CommentsManager
 
         return $comments;
     }
-
+	
+	/** update d'un commentaire
+	 * @param Comment $comment
+	 */
     public function modify(Comment $comment)
     {
         $sql = 'UPDATE comments SET 
@@ -67,7 +78,12 @@ class CommentsManagerPDO extends CommentsManager
         
         $request->execute();
     }
-
+	
+	/** retourne le commentaire correspondant à l'id passé en paramètre
+	 * @param $id
+	 *
+	 * @return Comment
+	 */
     public function get($id)
     {
         $sql = 'SELECT id,news,auteur,contenu
@@ -84,7 +100,10 @@ class CommentsManagerPDO extends CommentsManager
 
         return $comment;
     }
-
+	
+	/** supprime un commentaire
+	 * @param $id
+	 */
     public function delete($id)
     {
         $sql = 'DELETE FROM comments
@@ -95,7 +114,10 @@ class CommentsManagerPDO extends CommentsManager
 
         $request->execute();
     }
-
+	
+	/** supprime les commentaires d'une news
+	 * @param $news
+	 */
     public function deleteFromNews($news)
     {
         $sql = 'DELETE FROM comments

@@ -11,6 +11,9 @@ use \FormBuilder\CommentFormBuilder;
 use \OCFram\FormHandler;
 
 class NewsController extends BackController {
+	/** affichage des news sur la page d'accueil
+	 * @param HTTPRequest $request
+	 */
 	public function executeIndex( HTTPRequest $request ) {
 		$nbNews       = $this->_app->config()->get( 'nombre_news' );
 		$nbCaracteres = $this->_app->config()->get( 'nombre_caracteres' );
@@ -36,6 +39,9 @@ class NewsController extends BackController {
 		$this->_page->addVar( 'listeNews', $listeNews );
 	}
 	
+	/** affichage d'une news est ses commentaires
+	 * @param HTTPRequest $request
+	 */
 	public function executeShow( HTTPRequest $request ) {
 		$manager = $this->_managers->getManagerOf( 'News' );
 		
@@ -50,20 +56,32 @@ class NewsController extends BackController {
 		$this->_page->addVar( 'comments', $this->_managers->getManagerOf( 'Comments' )->getListOf( $news->id() ) );
 	}
 	
+	/** insertion d'un commentaire
+	 * @param HTTPRequest $request
+	 */
 	public function executeInsertComment( HTTPRequest $request ) {
 		if ( $request->method() == 'POST' ) {
-			$comment = new Comment( [
-				'news'    => $request->getData( 'news' ),
-				'auteur'  => $request->postData( 'auteur' ),
-				'contenu' => $request->postData( 'contenu' ),
-			] );
+			if($request->postExists('auteur')) {
+				$comment = new Comment( [
+					'news'    => $request->getData( 'news' ),
+					'auteur'  => $request->postData( 'auteur' ),
+					'contenu' => $request->postData( 'contenu' ),
+				] );
+			}
+			else{
+				$comment = new Comment( [
+					'news'    => $request->getData( 'news' ),
+					'contenu' => $request->postData( 'contenu' ),
+				] );
+				$comment->setAuteur($this->_app->user()->getLogin());
+			}
 		}
 		else {
 			$comment = new Comment;
 		}
 		
 		$formBuilder = new CommentFormBuilder( $comment );
-		$formBuilder->build();
+		$formBuilder->build($this->_app->user(),$this->_managers->getManagerOf('Members'));
 		
 		$form = $formBuilder->form();
 		

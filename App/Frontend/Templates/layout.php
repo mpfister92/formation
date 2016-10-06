@@ -29,14 +29,21 @@ $deviceType = ($detect->isMobile() ? ($detect->isTablet() ? 'tablette' : 'télé
 			<nav>
 				<ul>
 					<li><a href="/">Accueil</a></li>
-					<?php if ( $user->isAuthenticated() ) { ?>
-						<li><a href="/admin/">Admin</a></li>
-						<li><a href="/admin/news-insert.html">Ajouter une news</a></li>
-						<li><a href="/admin/deconnexion.html">Deconnexion</a></li>
-					<?php }
-					else { ?>
-						<li><a href="/admin/">Connexion Admin</a></li>
-					<?php } ?>
+					<?php
+					if ( $user->isAuthenticated() ):
+						if ($user->getStatus() == 'admin'):
+							echo "<li><a href='/admin/'>Admin</a></li>";
+						endif;
+						if($user->getStatus() == 'member'):
+							echo "<li><a href='/admin/'>Vos news</a></li>";
+						endif;
+						echo "<li><a href='/admin/news-insert.html'>Ajouter une news</a></li>";
+						echo "<li><a href='/admin/deconnexion.html'>Deconnexion</a></li>";
+					elseif (!$user->isAuthenticated()):
+						echo "<li><a href='/admin/connexion.html'>Connexion</a></li>";
+						echo "<li><a href='/inscription.html'>S'inscrire</a></li>";
+					endif; ?>
+					
 				</ul>
 			</nav>
 			
