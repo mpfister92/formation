@@ -3,8 +3,10 @@
 namespace FormBuilder;
 
 use OCFram\ConfirmationValidator;
+use OCFram\EmailValidator;
 use \OCFram\FormBuilder;
 use OCFram\Manager;
+use OCFram\PasswordValidator;
 use \OCFram\StringField;
 use \OCFram\MaxLengthValidator;
 use \OCFram\NotNullValidator;
@@ -17,7 +19,7 @@ class MemberFormBuilder extends FormBuilder {
 	
 	public function build(User $user = null, Manager $manager = null ) {
 		
-		$this->_form->add(new StringField( [
+		$login_field = new StringField( [
 			'label'      => 'Pseudo',
 			'name'       => 'login',
 			'maxLength'  => 20,
@@ -26,7 +28,9 @@ class MemberFormBuilder extends FormBuilder {
 				new NotNullValidator( 'Merci de spécifier un pseudo' ),
 				new UniqueValidator( 'Ce login existe déjà !', $manager, 'existsMemberUsingLogin' ),
 			],
-		] ) );
+		] ) ;
+		
+		$this->_form->add($login_field);
 		
 		$password_field = new PasswordField( [
 			'label'      => 'Mot de Passe',
@@ -35,6 +39,7 @@ class MemberFormBuilder extends FormBuilder {
 			'validators' => [
 				new MaxLengthValidator( 'Le mot de passe spécifié est trop long', 20 ),
 				new NotNullValidator( 'Merci de spécifier un mot de passe' ),
+				new PasswordValidator('Le mot de passe doit être différent de votre pseudo',$login_field),
 			],
 		] ) ;
 		
@@ -60,6 +65,7 @@ class MemberFormBuilder extends FormBuilder {
 			'validators' => [
 				new UniqueValidator( 'Cet e-mail existe déjà !', $manager, 'existsMemberUsingEmail' ),
 				new NotNullValidator( 'Merci de renseigner un E-mail' ),
+				new EmailValidator('E-mail invalide ! '),
 			],
 		] ) ;
 		
@@ -72,6 +78,7 @@ class MemberFormBuilder extends FormBuilder {
 			'validators' => [
 				new NotNullValidator( 'Merci de confirmer votre E-mail' ),
 				new ConfirmationValidator( 'Erreur : e-mails différents', $email_field),
+				new EmailValidator('E-mail invalide ! '),
 			],
 		] ) );
 	}

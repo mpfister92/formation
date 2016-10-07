@@ -37,14 +37,14 @@ abstract class MembersManager extends Manager {
 	/** Ajoute un membre à la base de données
 	 * @param Member $member
 	 */
-	abstract public function add( Member $member );
+	abstract public function addMember( Member $member );
 	
 	/** appelle la méthode add si le membre est valide
 	 * @param Member $member
 	 */
 	public function save( Member $member ) {
 		if ( $member->isValid() ) {
-			$this->add( $member );
+			$this->addMember( $member );
 		}
 		else {
 			throw new \RuntimeException( 'Le login existe déjà' );

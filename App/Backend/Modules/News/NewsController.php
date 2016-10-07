@@ -12,6 +12,7 @@ use \OCFram\FormHandler;
 
 class NewsController extends BackController {
 	/** affichage des news pour le backend
+	 *
 	 * @param HTTPRequest $request
 	 */
 	public function executeIndex( HTTPRequest $request ) {
@@ -21,17 +22,18 @@ class NewsController extends BackController {
 		
 		if ( $this->_app->user()->getStatus() == 'admin' ) {
 			$this->_page->addVar( 'listeNews', $manager->getList() );
-			$this->_page->addVar( 'nombreNews', $manager->count() );
+			$this->_page->addVar( 'nombreNews', $manager->countNews() );
 		}
 		else {
 			if ( $this->_app->user()->getStatus() == 'member' ) {
-				$this->_page->addVar( 'listeNews', $manager->getList(-1,-1,$this->_app->user()->getLogin() ) );
-				$this->_page->addVar( 'nombreNews', $manager->countNewsForMember( $this->_app->user()->getLogin() ) );
+				$this->_page->addVar( 'listeNews', $manager->getList( -1, -1, $this->_app->user()->getLogin() ) );
+				$this->_page->addVar( 'nombreNews', $manager->countNews( $this->_app->user()->getLogin() ) );
 			}
 		}
 	}
 	
 	/** insertion d'une news
+	 *
 	 * @param HTTPRequest $request
 	 */
 	public function executeInsert( HTTPRequest $request ) {
@@ -41,6 +43,7 @@ class NewsController extends BackController {
 	}
 	
 	/** gestion du formulaire pour l'insertion et l'update
+	 *
 	 * @param HTTPRequest $request
 	 */
 	public function processForm( HTTPRequest $request ) {
@@ -88,66 +91,112 @@ class NewsController extends BackController {
 	}
 	
 	/** update d'une news
+	 *
 	 * @param HTTPRequest $request
 	 */
 	public function executeUpdate( HTTPRequest $request ) {
-		$this->processForm( $request );
-		
-		$this->_page->addVar( 'title', 'Modification d\'une news' );
+		if ( $request->getExists( 'id' ) ) {
+			$id    = $request->getData( 'id' );
+			$login = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $id );
+			if ( $login == $this->_app->user()->getLogin() || $this->_app->user()->getStatus() == 'admin' ) {
+				$this->processForm( $request );
+				$this->_page->addVar( 'title', 'Modification d\'une news' );
+			}
+			else {
+				$this->_app->httpResponse()->redirect404();
+			}
+		}
 	}
 	
 	/** suppression d'une news
+	 *
 	 * @param HTTPRequest $request
 	 */
 	public function executeDelete( HTTPRequest $request ) {
-		$this->_managers->getManagerOf( 'News' )->delete( $request->getData( 'id' ) );
-		$this->_managers->getManagerOf( 'Comments' )->deleteFromNews( $request->getData( 'id' ) );
-		
-		$this->_app->user()->setFlash( 'La news a bien été supprimée !' );
-		
-		$this->_app->httpResponse()->redirect( '.' );
+		if ( $request->getExists( 'id' ) ) {
+			$id    = $request->getData( 'id' );
+			$login = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $id );
+			if ( $login == $this->_app->user()->getLogin() || $this->_app->user()->getStatus() == 'admin' ) {
+				$this->_managers->getManagerOf( 'News' )->delete( $request->getData( 'id' ) );
+				$this->_managers->getManagerOf( 'Comments' )->deleteFromNews( $request->getData( 'id' ) );
+				
+				$this->_app->user()->setFlash( 'La news a bien été supprimée !' );
+				
+				$this->_app->httpResponse()->redirect( '.' );
+			}
+			else {
+				$this->_app->httpResponse()->redirect404();
+			}
+		}
 	}
 	
 	/** update d'un commentaire
+	 *
 	 * @param HTTPRequest $request
 	 */
 	public function executeUpdateComment( HTTPRequest $request ) {
 		$this->_page->addVar( 'title', 'Modification d\'un commentaire' );
 		
 		if ( $request->method() == 'POST' ) {
-			$comment = new Comment( [
-				'id'      => $request->getData( 'id' ),
-				'auteur'  => $request->postData( 'auteur' ),
-				'contenu' => $request->postData( 'contenu' ),
-			] );
+			if ( $request->postExists( 'auteur' ) ) {
+				$comment = new Comment( [
+					'id'      => $request->getData( 'id' ),
+					'auteur'  => $request->postData( 'auteur' ),
+					'contenu' => $request->postData( 'contenu' ),
+				] );
+			}
+			else {
+				$comment = new Comment ( [
+					'id'      => $request->getData( 'id' ),
+					'contenu' => $request->postData( 'contenu' ),
+				] );
+				$comment->setAuteur( $this->_app->user()->getLogin() );
+			}
 		}
 		else {
 			$comment = $this->_managers->getManagerOf( 'Comments' )->get( $request->getData( 'id' ) );
 		}
 		
-		$formBuilder = new CommentFormBuilder( $comment );
-		$formBuilder->build();
-		
-		$form = $formBuilder->form();
-		
-		$formHandler = new FormHandler( $form, $this->_managers->getManagerOf( 'Comments' ), $request );
-		
-		if ( $formHandler->process() ) {
-			$this->_app->user()->setFlash( 'Le commentaire a bien été modifié !' );
-			$this->_app->httpResponse()->redirect( '/admin/' );
+		if ( $request->getExists( 'id' ) ) {
+			$id_comment     = $request->getData( 'id' );
+			$news_author    = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
+			$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
+			if ( ($comment_author != 'admin' && ($comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin()) || ($this->_app->user()->getStatus() == 'admin'))) {
+				$formBuilder = new CommentFormBuilder( $comment );
+				$formBuilder->build( $this->_app->user(), $this->_managers->getManagerOf( 'Members' ) );
+				
+				$form = $formBuilder->form();
+				
+				$formHandler = new FormHandler( $form, $this->_managers->getManagerOf( 'Comments' ), $request );
+				
+				if ( $formHandler->process() ) {
+					$this->_app->user()->setFlash( 'Le commentaire a bien été modifié !' );
+					$this->_app->httpResponse()->redirect( '/admin/' );
+				}
+				$this->_page->addVar( 'form', $form->createView() );
+			}
+			else {
+				$this->_app->httpResponse()->redirect404();
+			}
 		}
-		$this->_page->addVar( 'form', $form->createView() );
 	}
 	
 	/** suppression d'un commentaire
+	 *
 	 * @param HTTPRequest $request
 	 */
 	public function executeDeleteComment( HTTPRequest $request ) {
-		$this->_managers->getManagerOf( 'Comments' )->delete( $request->getData( 'id' ) );
-		
-		$this->_app->user()->setFlash( 'Le commentaire a bien été supprimé !' );
-		
-		$this->_app->httpResponse()->redirect( '.' );
+		$id_comment     = $request->getData( 'id' );
+		$news_author    = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
+		$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
+		if ( ($comment_author != 'admin' && ($comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin()) || ($this->_app->user()->getStatus() == 'admin'))) {
+			$this->_managers->getManagerOf( 'Comments' )->delete( $request->getData( 'id' ) );
+			$this->_app->user()->setFlash( 'Le commentaire a bien été supprimé !' );
+			$this->_app->httpResponse()->redirect( '.' );
+		}
+		else {
+			$this->_app->httpResponse()->redirect404();
+		}
 	}
 }
 

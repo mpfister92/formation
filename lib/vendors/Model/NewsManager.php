@@ -32,7 +32,7 @@ abstract class NewsManager extends Manager
 	/** retourne le nombre de news dans la base
 	 * @return int
 	 */
-    abstract public function count();
+    abstract public function countNews($name = null);
 	
 	/** ajoute une news dans la base
 	 * @param News $news
@@ -49,12 +49,6 @@ abstract class NewsManager extends Manager
 	 */
     abstract public function delete($id);
 	
-	/** Retourne le nombre de news écrite apr l'auteur $name
-	 * @param string $name
-	 *
-	 * @return int
-	 */
-	abstract public function countNewsForMember($name);
 	
 	/** détermine la méthode a appeler (update/add) selon la news passée en parametres
 	 * @param News $news
@@ -71,4 +65,11 @@ abstract class NewsManager extends Manager
             throw new \RuntimeException('La news doit être validée pour être enregistrée');
         }
     }
+	
+	/** supprime une news de la base
+	 *
+	 * @param int $id
+	 * @return string $result
+	 */
+    abstract public function getLoginFromNewsId($id);
 }

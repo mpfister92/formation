@@ -10,34 +10,6 @@ use \OCFram\FormHandler;
 
 
 class ConnexionController extends BackController {
-	
-	/*public function executeIndex( HTTPRequest $request ) {
-		$this->_page->addVar( 'title', 'Connexion' );
-		
-		if ( $request->method() == 'POST' ) {
-			$login    = $request->postData( 'login' );
-			$password = $request->postData( 'password' );
-			
-			if ( $this->_managers->getManagerOf( 'Members' )->getMember( $login, $password ) == 1 ) {
-				$this->_app->user()->setMemberAuthenticated( true );
-				$this->_app->user()->setLogin($login);
-				$this->_app->user()->setStatus('membre');
-				$this->_app->httpResponse()->redirect( '/' );
-			}
-			else {
-				$this->_app->user()->setFlash( 'Le pseudo ou le mot de passe est incorrect' );
-			}
-		}
-	}
-	
-	public function executeDeconnexion( HTTPRequest $request ) {
-		$this->_page->addVar( 'title', 'Deconnexion' );
-		
-		$this->_app->user()->setMemberAuthenticated( false );
-		$this->_app->user()->unssetSession();
-		$this->_app->httpResponse()->redirect( '/' );
-	}*/
-	
 	public function executeInscription( HTTPRequest $request ) {
 		if ( $request->method() == 'POST' ) {
 			$member = new Member( [
@@ -68,4 +40,5 @@ class ConnexionController extends BackController {
 		$this->_page->addVar( 'member', $member );
 		$this->_page->addVar( 'form', $form->createView() );
 	}
+	
 }

@@ -9,12 +9,16 @@ use \OCFram\HTTPRequest;
 use \Entity\Comment;
 use \FormBuilder\CommentFormBuilder;
 use \OCFram\FormHandler;
+require 'C:\Users\mpfister\Desktop\UwAmp\www\formation\App\AppController.php';
 
 class NewsController extends BackController {
+	use \AppController;
 	/** affichage des news sur la page d'accueil
+	 *
 	 * @param HTTPRequest $request
 	 */
 	public function executeIndex( HTTPRequest $request ) {
+		//require_once 'C:\Users\mpfister\Desktop\UwAmp\www\formation\vendor\mobiledetect\mobiledetectlib\namespaced\Detection\MobileDetect.php';
 		$nbNews       = $this->_app->config()->get( 'nombre_news' );
 		$nbCaracteres = $this->_app->config()->get( 'nombre_caracteres' );
 		
@@ -34,12 +38,21 @@ class NewsController extends BackController {
 				$news->setContenu( $debut );
 			}
 		}
-		
 		// On ajoute la variable $listeNews à la vue.
 		$this->_page->addVar( 'listeNews', $listeNews );
+		
+		$this->run();
+		
+//		$detect      = new MobileDetect;
+//		$device_type = ( $detect->isMobile() ? ( $detect->isTablet() ? 'tablette' : 'téléphone' ) : 'ordinateur' );
+//		$this->_page->addVar( 'device_type', $device_type );
+//
+//		$user = $this->_app->user();
+//		$this->_page->addVar( 'user', $user );
 	}
 	
 	/** affichage d'une news est ses commentaires
+	 *
 	 * @param HTTPRequest $request
 	 */
 	public function executeShow( HTTPRequest $request ) {
@@ -57,23 +70,24 @@ class NewsController extends BackController {
 	}
 	
 	/** insertion d'un commentaire
+	 *
 	 * @param HTTPRequest $request
 	 */
 	public function executeInsertComment( HTTPRequest $request ) {
 		if ( $request->method() == 'POST' ) {
-			if($request->postExists('auteur')) {
+			if ( $request->postExists( 'auteur' ) ) {
 				$comment = new Comment( [
 					'news'    => $request->getData( 'news' ),
 					'auteur'  => $request->postData( 'auteur' ),
 					'contenu' => $request->postData( 'contenu' ),
 				] );
 			}
-			else{
+			else {
 				$comment = new Comment( [
 					'news'    => $request->getData( 'news' ),
 					'contenu' => $request->postData( 'contenu' ),
 				] );
-				$comment->setAuteur($this->_app->user()->getLogin());
+				$comment->setAuteur( $this->_app->user()->getLogin() );
 			}
 		}
 		else {
@@ -81,7 +95,7 @@ class NewsController extends BackController {
 		}
 		
 		$formBuilder = new CommentFormBuilder( $comment );
-		$formBuilder->build($this->_app->user(),$this->_managers->getManagerOf('Members'));
+		$formBuilder->build( $this->_app->user(), $this->_managers->getManagerOf( 'Members' ) );
 		
 		$form = $formBuilder->form();
 		

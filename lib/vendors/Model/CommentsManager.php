@@ -62,4 +62,18 @@ abstract class CommentsManager extends Manager
             throw new \RuntimeException('Le commentaire doit être validé pour être enregistré');
         }
     }
+    
+	/** retoune le nom de l'auteur de la news pour le commentaire numéro $id
+	 * @param int $id
+	 *
+	 * @return string
+	 */
+    abstract public function getNewsAuthorFromIdComment($id);
+	
+    /** retourne l'auteur d'un commentaire
+	 * @param int $id
+	 *
+	 * @return string
+	 */
+	abstract public function getCommentAuthorFromId($id);
 }

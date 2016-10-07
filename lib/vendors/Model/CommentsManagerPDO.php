@@ -18,11 +18,11 @@ class CommentsManagerPDO extends CommentsManager
 	 */
     protected function add(Comment $comment)
     {
-        $sql = 'INSERT INTO comments SET 
-                  news = :news,
-                  auteur = :auteur,
-                  contenu = :contenu,
-                  date = NOW()';
+        $sql = 'INSERT INTO t_new_commentc SET 
+                  NCC_news = :news,
+                  NCC_auteur = :auteur,
+                  NCC_contenu = :contenu,
+                  NCC_date = NOW() ';
 
         $requete = $this->_dao->prepare($sql);
         $requete->bindValue(':news', $comment->news(), \PDO::PARAM_INT);
@@ -41,9 +41,9 @@ class CommentsManagerPDO extends CommentsManager
 	 */
     public function getListOf($news)
     {
-        $sql = 'SELECT news,auteur,contenu,date,id
-                FROM comments
-                WHERE news = :news';
+        $sql = 'SELECT NCC_news AS news,NCC_auteur AS auteur,NCC_contenu AS contenu,NCC_date AS date,NCC_id AS id
+                FROM t_new_commentc
+                WHERE NCC_news = :news';
 
         $requete = $this->_dao->prepare($sql);
         $requete->bindValue(':news', $news, \PDO::PARAM_INT);
@@ -66,10 +66,10 @@ class CommentsManagerPDO extends CommentsManager
 	 */
     public function modify(Comment $comment)
     {
-        $sql = 'UPDATE comments SET 
-                auteur = :auteur,
-                contenu = :contenu
-                WHERE id = :id';
+        $sql = 'UPDATE t_new_commentc SET 
+                NCC_auteur = :auteur,
+                NCC_contenu = :contenu
+                WHERE NCC_id = :id';
 
         $request = $this->_dao->prepare($sql);
         $request->bindValue(':auteur', $comment->auteur());
@@ -86,9 +86,9 @@ class CommentsManagerPDO extends CommentsManager
 	 */
     public function get($id)
     {
-        $sql = 'SELECT id,news,auteur,contenu
-                FROM comments
-                WHERE id = :id';
+        $sql = 'SELECT NCC_id AS id,NCC_news AS news,NCC_auteur AS auteur,NCC_contenu AS contenu
+                FROM t_new_commentc
+                WHERE NCC_id = :id';
 
         $request = $this->_dao->prepare($sql);
         $request->bindValue(':id', (int) $id, \PDO::PARAM_INT);
@@ -106,8 +106,8 @@ class CommentsManagerPDO extends CommentsManager
 	 */
     public function delete($id)
     {
-        $sql = 'DELETE FROM comments
-                WHERE id = :id';
+        $sql = 'DELETE FROM t_new_commentc
+                WHERE NCC_id = :id';
 
         $request = $this->_dao->prepare($sql);
         $request->bindValue(':id', (int)$id, \PDO::PARAM_INT);
@@ -120,12 +120,53 @@ class CommentsManagerPDO extends CommentsManager
 	 */
     public function deleteFromNews($news)
     {
-        $sql = 'DELETE FROM comments
-                WHERE news = :news';
+        $sql = 'DELETE FROM t_new_commentc
+                WHERE NCC_news = :news';
 
         $request = $this->_dao->prepare($sql);
         $request->bindValue(':news', (int)$news, \PDO::PARAM_INT);
 
         $request->execute();
     }
+	
+	/** retoune le nom de l'auteur de la news pour le commentaire numéro $id
+	 * @param int $id
+	 *
+	 * @return string
+	 */
+	public function getNewsAuthorFromIdComment($id){
+		$sql = 'SELECT NNC_auteur
+				FROM t_new_commentc 
+				INNER JOIN t_new_newsc ON NCC_news = NNC_id
+				WHERE NCC_id = :id';
+		
+		$requete = $this->_dao->prepare($sql);
+		$requete->bindValue(':id',$id,\PDO::PARAM_INT);
+		
+		$requete->execute();
+		
+		$result = $requete->fetchColumn();
+		return $result;
+	}
+	
+	/** retourne l'auteur d'un commentaire
+	 * @param int $id
+	 *
+	 * @return string
+	 */
+	public function getCommentAuthorFromId($id){
+		$sql = 'SELECT NCC_auteur
+				FROM t_new_commentc
+				WHERE NCC_id = :id';
+		
+		$request = $this->_dao->prepare($sql);
+		
+		$request->bindValue(':id',$id,\PDO::PARAM_INT);
+		
+		$request->execute();
+		
+		$result = $request->fetchColumn();
+		
+		return $result;
+	}
 }
