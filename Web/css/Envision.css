@@ -126,12 +126,15 @@ td {
 	border-left: 1px solid #FFF;
 	border-bottom: solid 1px #ffffff;
     text-align: center;
+	word-wrap: break-word;
 }
 form td {
     text-align: left;
+	word-wrap: break-word;
 }
 td.first,th.first {
 	border-left: 0px;
+	word-wrap: break-word;
 }
 tr.row-a {
 	background: #F8F8F8;

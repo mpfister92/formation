@@ -2,8 +2,10 @@
 
 namespace App;
 
+use Composer\Package\Link;
 use \Detection\MobileDetect;
 use OCFram\Application;
+use OCFram\Linking;
 
 /**
  * Trait AppController
@@ -26,17 +28,17 @@ trait AppController {
 		
 		if ( $user->isAuthenticated() ) {
 			if ( $user->getStatus() == 'admin' ) {
-				$menu[ 'Admin' ] = "/admin/";
+				$menu[ 'Admin' ] = Linking::provideRoute('Backend','News','index',[]);
 			}
 			if ( $user->getStatus() == 'member' ) {
-				$menu[ 'Vos news' ] = "/admin/";
+				$menu[ 'Vos news' ] = Linking::provideRoute('Backend','News','index',[]);
 			}
-			$menu [ 'Ajouter une news' ] = "/admin/news-insert.html";
-			$menu[ 'Deconnexion' ]       = "/admin/deconnexion.html";
+			$menu [ 'Ajouter une news' ] = Linking::provideRoute('Backend','News','insert',[]);
+			$menu[ 'Deconnexion' ]       = Linking::provideRoute('Backend','Connexion','deconnexion',[]);
 		}
 		else {
-			$menu[ 'Connexion' ]   = "/admin/connexion.html";
-			$menu[ 'S\'inscrire' ] = "/inscription.html";
+			$menu[ 'Connexion' ]   = Linking::provideRoute('Backend','Connexion','index',[]);
+			$menu[ 'S\'inscrire' ] = Linking::provideRoute('Frontend','Connexion','inscription',[]);
 		}
 		
 		$this->page()->addVar('menu',$menu);

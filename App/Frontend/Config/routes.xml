@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <routes>
-	<route url="/" module="News" action="index"></route>
-	<route url="/news-([0-9]+)\.html" module="News" action="show" vars="id"></route>
-	<route url="/commenter-([0-9]+)\.html" module="News" action="insertComment" vars="news"></route>
-	<route url="/device\.html" module="Device" action="index"></route>
-	<route url="/inscription\.html" module="Connexion" action="inscription"></route>
+	<route url="/" rewrite="/" module="News" action="index"></route>
+	<route url="/news-([0-9]+)\.html" rewrite="/news-(id).html" module="News" action="show" vars="id"></route>
+	<route url="/commenter-([0-9]+)\.html" rewrite="/commenter-(id).html" module="News" action="insertComment" vars="news"></route>
+	<route url="/device\.html" rwrite="/device.html" module="Device" action="index"></route>
+	<route url="/inscription\.html" rewrite="/inscription.html" module="Connexion" action="inscription"></route>
 </routes>

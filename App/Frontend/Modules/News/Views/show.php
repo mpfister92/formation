@@ -1,10 +1,12 @@
+<?php use OCFram\Linking; ?>
+
 <p>Par <em><?= $news_author ?></em>, le <?= $news[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?></p>
 <h2><?= $news[ 'titre' ] ?></h2>
-<p style="display:bloc;"><?= nl2br( $news[ 'contenu' ] ) ?></p>
+<p><?= nl2br( $news[ 'contenu' ] ) ?></p>
 
 <?php if ( $news[ 'dateAjout' ] != $news[ 'dateModif' ] ) { ?>
 	<p style="text-align: right;">
-		<small><em>Modifiée le <?= $news[ 'dateModif' ]->format( 'd/m/Y à H\hi' ) ?></em></small>
+		<small><em>Modifiée le <?= $news[ 'dateModif' ]->format( 'd/m/Y à H\hi') ?></em></small>
 	</p>
 <?php } ?>
 
@@ -23,10 +25,9 @@ if ( empty( $comments ) ) {
 foreach ( $comments as $comment ) {
 	?>
 	<fieldset>
-		<legend>
 			Posté par
 			<strong>
-				<?php if ( $comment[ 'auteur' ] != null ): ?>
+				<?php if ( htmlentities($comment[ 'auteur' ]) != null ): ?>
 					<?= htmlspecialchars( $comment[ 'auteur' ] ) ?>
 				<?php else: ?>
 					<?= htmlspecialchars($manager->getLoginMemberFromId($comment['member'])) ?>
@@ -35,11 +36,11 @@ foreach ( $comments as $comment ) {
 			le <?= $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) ?>
 			<?php if ( $user->isAuthenticated() ): ?>
 				<?php if ( $user->getStatus() == 'admin' ): ?>
-					<a href="admin/comment-update-<?= $comment[ 'id' ] ?>.html">Modifier</a> |
-					<a href="admin/comment-delete-<?= $comment[ 'id' ] ?>.html">Supprimer</a>
+					 <a href=" <?= Linking::provideRoute('Backend','News','updateComment',['id' => $comment['id']]) ?>">Modifier</a>  |
+					 <a href=" <?= Linking::provideRoute('Backend','News','deleteComment',['id' => $comment['id']]) ?>">Supprimer</a>
 				<?php elseif ( $comment[ 'auteur' ] != 'admin' && ( $user->getLogin() == $comment[ 'auteur' ] || $user->getLogin() == $news_author || $user->getStatus() == 'admin' ) ): ?>
-					<a href="admin/comment-update-<?= $comment[ 'id' ] ?>.html">Modifier</a> |
-					<a href="admin/comment-delete-<?= $comment[ 'id' ] ?>.html">Supprimer</a>
+					<a href=" <?= Linking::provideRoute('Backend','News','updateComment',['id' => $comment['id']]) ?>">Modifier</a>  |
+					<a href=" <?= Linking::provideRoute('Backend','News','deleteComment',['id' => $comment['id']]) ?>">Supprimer</a>
 				<?php endif; ?>
 			<?php endif; ?>
 		</legend>
