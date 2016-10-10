@@ -66,11 +66,13 @@ img.float-left {
 h1, h2, h3, p {
 	padding: 10px;		
 	margin: 0;
+	word-wrap: break-word;
 }
 ul, ol {
 	margin: 5px 20px;
 	padding: 0 20px;
 }
+
 
 code {
   margin: 5px 0;
@@ -341,6 +343,7 @@ nav ul li#current a {
 	padding-left: 20px; margin: 0 10px 0 5px;
 }
 
+
 /* Sidebar */	
 #sidebar {
 	float: right;
@@ -408,4 +411,3 @@ footer a {
 .clear { clear: both; }
 
 .middle { vertical-align: middle; }
-

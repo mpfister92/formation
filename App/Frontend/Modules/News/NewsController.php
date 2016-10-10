@@ -3,22 +3,25 @@
 
 namespace App\Frontend\Modules\News;
 
+use App\AppController;
 use Model\NewsManager;
 use \OCFram\BackController;
 use \OCFram\HTTPRequest;
 use \Entity\Comment;
 use \FormBuilder\CommentFormBuilder;
 use \OCFram\FormHandler;
-require 'C:\Users\mpfister\Desktop\UwAmp\www\formation\App\AppController.php';
+
 
 class NewsController extends BackController {
-	use \AppController;
+	use AppController;
+	
 	/** affichage des news sur la page d'accueil
 	 *
 	 * @param HTTPRequest $request
 	 */
 	public function executeIndex( HTTPRequest $request ) {
-		//require_once 'C:\Users\mpfister\Desktop\UwAmp\www\formation\vendor\mobiledetect\mobiledetectlib\namespaced\Detection\MobileDetect.php';
+		$this->run();
+		
 		$nbNews       = $this->_app->config()->get( 'nombre_news' );
 		$nbCaracteres = $this->_app->config()->get( 'nombre_caracteres' );
 		
@@ -31,24 +34,13 @@ class NewsController extends BackController {
 		$listeNews = $manager->getList( 0, $nbNews );
 		
 		foreach ( $listeNews as $news ) {
-			if ( strlen( $news->contenu() ) > $nbCaracteres ) {
-				$debut = substr( $news->contenu(), 0, $nbCaracteres );
-				$debut = substr( $debut, 0, strrpos( $debut, ' ' ) ) . '...';
-				
+			//if ( strlen( $news->contenu() ) > $nbCaracteres ) {
+				$debut = mb_strimwidth($news->contenu(),0,$nbCaracteres,"...");
 				$news->setContenu( $debut );
-			}
+			//}
 		}
 		// On ajoute la variable $listeNews à la vue.
 		$this->_page->addVar( 'listeNews', $listeNews );
-		
-		$this->run();
-		
-//		$detect      = new MobileDetect;
-//		$device_type = ( $detect->isMobile() ? ( $detect->isTablet() ? 'tablette' : 'téléphone' ) : 'ordinateur' );
-//		$this->_page->addVar( 'device_type', $device_type );
-//
-//		$user = $this->_app->user();
-//		$this->_page->addVar( 'user', $user );
 	}
 	
 	/** affichage d'une news est ses commentaires
@@ -56,6 +48,8 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $request
 	 */
 	public function executeShow( HTTPRequest $request ) {
+		$this->run();
+		
 		$manager = $this->_managers->getManagerOf( 'News' );
 		
 		$news = $manager->getNews( $request->getData( 'id' ) );
@@ -67,6 +61,8 @@ class NewsController extends BackController {
 		$this->_page->addVar( 'title', $news->titre() );
 		$this->_page->addVar( 'news', $news );
 		$this->_page->addVar( 'comments', $this->_managers->getManagerOf( 'Comments' )->getListOf( $news->id() ) );
+		$this->_page->addVar( 'news_author', $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $news->id() ) );
+		$this->_page->addVar('manager',$this->_managers->getManagerOf('Members'));
 	}
 	
 	/** insertion d'un commentaire
@@ -74,6 +70,8 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $request
 	 */
 	public function executeInsertComment( HTTPRequest $request ) {
+		$this->run();
+		
 		if ( $request->method() == 'POST' ) {
 			if ( $request->postExists( 'auteur' ) ) {
 				$comment = new Comment( [
@@ -87,7 +85,7 @@ class NewsController extends BackController {
 					'news'    => $request->getData( 'news' ),
 					'contenu' => $request->postData( 'contenu' ),
 				] );
-				$comment->setAuteur( $this->_app->user()->getLogin() );
+				$comment->setMember( $this->_managers->getManagerOf('Members')->getIdMemberFromLogin($this->getUser()->getLogin()) );
 			}
 		}
 		else {

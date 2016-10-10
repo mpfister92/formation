@@ -14,27 +14,24 @@
 		<div id="wrap">
 			<header>
 				<h1><a href="/">Mon super site</a></h1>
-				<!--<p>Comment ça, il n'y a presque rien ?</p><br />-->
+				<?php if ( $user->getLogin() ): ?>
+				<p><?= $user->getLogin() ?>
+					<?php else: ?>
+				<p>Non connecté
+					<?php endif; ?>
+					<?php if ( isset( $device_type ) ): ?>
+						sur <?= $device_type ?>
+					<?php endif; ?>
+				</p><br />
 			</header>
 			
 			<nav>
 				<ul>
-					<li><a href="/">Accueil</a></li>
-					<?php
-					if ( $user->isAuthenticated() ):
-						if ($user->getStatus() == 'admin'):
-							echo "<li><a href='/admin/'>Admin</a></li>";
-						endif;
-						if($user->getStatus() == 'member'):
-							echo "<li><a href='/admin/'>Vos news</a></li>";
-						endif;
-						echo "<li><a href='/admin/news-insert.html'>Ajouter une news</a></li>";
-						echo "<li><a href='/admin/deconnexion.html'>Deconnexion</a></li>";
-					elseif (!$user->isAuthenticated()):
-						echo "<li><a href='/admin/connexion.html'>Connexion</a></li>";
-						echo "<li><a href='/inscription.html'>S'inscrire</a></li>";
-					endif;
-					?>
+					<?php if ( isset( $menu ) ): ?>
+						<?php foreach ( $menu as $key => $value ): ?>
+							<?= "<li><a href='", $value, "'>", $key, "</a></li>" ?>
+						<?php endforeach; ?>
+					<?php endif; ?>
 				</ul>
 			</nav>
 			

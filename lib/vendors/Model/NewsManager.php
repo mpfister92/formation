@@ -14,7 +14,9 @@ use \Entity\News;
 
 abstract class NewsManager extends Manager
 {
-
+	const NEWS_STATE_VALID = 1;
+	const NEWS_STATE_INVALID = 2;
+	
     /**
      * @param int $debut
      * @param int $limite

@@ -1,18 +1,57 @@
 <?php
 
-use \Detection\MobileDetect;
+namespace App;
 
+use \Detection\MobileDetect;
+use OCFram\Application;
+
+/**
+ * Trait AppController
+ *
+ * @package App
+ */
 trait AppController {
-	public function run(){
-		require_once 'C:\Users\mpfister\Desktop\UwAmp\www\formation\vendor\mobiledetect\mobiledetectlib\namespaced\Detection\MobileDetect.php';
-		$detect = new MobileDetect;
-		$device_type = ($detect->isMobile() ? ($detect->isTablet() ? 'tablette' : 'téléphone') : 'ordinateur');
-		$method = 'page()->addVar(\'device_type\',$device_type)';
-		$this->$method();
+	private $menu = [];
+	
+	public function run() {
+		$detect      = new MobileDetect;
+		$device_type = ( $detect->isMobile() ? ( $detect->isTablet() ? 'tablette' : 'téléphone' ) : 'ordinateur' );
+		$this->page()->addVar( 'device_type', $device_type );
 		
-		//$user = self::_app->user();
-		//_page->addVar('user',$user);
+		$user = $this->app()->user();
+		$this->page()->addVar( 'user', $user );
+		
+		//build du menu
+		$menu[ 'Accueil' ] = "/";
+		
+		if ( $user->isAuthenticated() ) {
+			if ( $user->getStatus() == 'admin' ) {
+				$menu[ 'Admin' ] = "/admin/";
+			}
+			if ( $user->getStatus() == 'member' ) {
+				$menu[ 'Vos news' ] = "/admin/";
+			}
+			$menu [ 'Ajouter une news' ] = "/admin/news-insert.html";
+			$menu[ 'Deconnexion' ]       = "/admin/deconnexion.html";
+		}
+		else {
+			$menu[ 'Connexion' ]   = "/admin/connexion.html";
+			$menu[ 'S\'inscrire' ] = "/inscription.html";
+		}
+		
+		$this->page()->addVar('menu',$menu);
+	}
+	
+	/**
+	 * Check if the connected user is an administrator
+	 * @return bool
+	 */
+	public function loggetUserIsAdmin() {
+		return 'admin' == $this->app()->user()->getStatus();
+	}
+	
+	public function getUser() {
+		return $this->app()->user();
 	}
 }
-
 

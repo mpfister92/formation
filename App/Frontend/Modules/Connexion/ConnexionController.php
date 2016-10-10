@@ -2,6 +2,7 @@
 
 namespace App\Frontend\Modules\Connexion;
 
+use App\AppController;
 use \OCFram\BackController;
 use \OCFram\HTTPRequest;
 use \Entity\Member;
@@ -10,7 +11,14 @@ use \OCFram\FormHandler;
 
 
 class ConnexionController extends BackController {
+	const USER_TYPE_MEMBER = 2;
+	
+	use AppController;
+	
 	public function executeInscription( HTTPRequest $request ) {
+		
+		$this->run();
+		
 		if ( $request->method() == 'POST' ) {
 			$member = new Member( [
 				'login'                 => $request->postData( 'login' ),
@@ -19,6 +27,7 @@ class ConnexionController extends BackController {
 				'password_confirmation' => $request->postData( 'password_confirmation' ),
 				'email_confirmation'    => $request->postData( 'email_confirmation' ),
 			] );
+			$member->setUser_Type(self::USER_TYPE_MEMBER);
 		}
 		else {
 			$member = new Member;

@@ -2,6 +2,7 @@
 
 namespace App\Backend\Modules\News;
 
+use App\AppController;
 use \OCFram\BackController;
 use \FormBuilder\CommentFormBuilder;
 use \OCFram\HTTPRequest;
@@ -10,12 +11,18 @@ use \Entity\Comment;
 use \FormBuilder\NewsFormBuilder;
 use \OCFram\FormHandler;
 
+//require( 'C:\Users\mpfister\Desktop\UwAmp\www\formation\App\AppController.php');
+
 class NewsController extends BackController {
+	use AppController;
+	
 	/** affichage des news pour le backend
 	 *
 	 * @param HTTPRequest $request
 	 */
 	public function executeIndex( HTTPRequest $request ) {
+		$this->run();
+		
 		$this->_page->addVar( 'title', 'Gestion des news' );
 		
 		$manager = $this->_managers->getManagerOf( 'News' );
@@ -26,8 +33,8 @@ class NewsController extends BackController {
 		}
 		else {
 			if ( $this->_app->user()->getStatus() == 'member' ) {
-				$this->_page->addVar( 'listeNews', $manager->getList( -1, -1, $this->_app->user()->getLogin() ) );
-				$this->_page->addVar( 'nombreNews', $manager->countNews( $this->_app->user()->getLogin() ) );
+				$this->_page->addVar( 'listeNews', $manager->getList( -1, -1, $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) ) );
+				$this->_page->addVar( 'nombreNews', $manager->countNews( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) ) );
 			}
 		}
 	}
@@ -37,6 +44,8 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $request
 	 */
 	public function executeInsert( HTTPRequest $request ) {
+		$this->run();
+		
 		$this->processForm( $request );
 		
 		$this->_page->addVar( 'title', 'Ajout d\'une news' );
@@ -60,7 +69,7 @@ class NewsController extends BackController {
 					'titre'   => $request->postData( 'titre' ),
 					'contenu' => $request->postData( 'contenu' ),
 				] );
-				$news->setAuteur( $this->_app->user()->getLogin() );
+				$news->setAuteur( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
 			}
 			
 			if ( $request->getExists( 'id' ) ) {
@@ -95,16 +104,18 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $request
 	 */
 	public function executeUpdate( HTTPRequest $request ) {
-		if ( $request->getExists( 'id' ) ) {
-			$id    = $request->getData( 'id' );
-			$login = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $id );
-			if ( $login == $this->_app->user()->getLogin() || $this->_app->user()->getStatus() == 'admin' ) {
-				$this->processForm( $request );
-				$this->_page->addVar( 'title', 'Modification d\'une news' );
-			}
-			else {
-				$this->_app->httpResponse()->redirect404();
-			}
+		$this->run();
+		
+		$id    = $request->getData( 'id' );
+		$login = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $id );
+		if ( $login !== $this->_app->user()->getLogin() && $this->_app->user()->getStatus() !== 'admin' ) {
+			$this->_app->httpResponse()->redirect404();
+		}
+		else {
+			$this->processForm( $request );
+			$this->_page->addVar( 'title', 'Modification d\'une news' );
+			
+			$this->processForm( $request );
 		}
 	}
 	
@@ -113,6 +124,8 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $request
 	 */
 	public function executeDelete( HTTPRequest $request ) {
+		$this->run();
+		
 		if ( $request->getExists( 'id' ) ) {
 			$id    = $request->getData( 'id' );
 			$login = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $id );
@@ -135,6 +148,8 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $request
 	 */
 	public function executeUpdateComment( HTTPRequest $request ) {
+		$this->run();
+		
 		$this->_page->addVar( 'title', 'Modification d\'un commentaire' );
 		
 		if ( $request->method() == 'POST' ) {
@@ -150,7 +165,7 @@ class NewsController extends BackController {
 					'id'      => $request->getData( 'id' ),
 					'contenu' => $request->postData( 'contenu' ),
 				] );
-				$comment->setAuteur( $this->_app->user()->getLogin() );
+				$comment->setAuteur( $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $request->getData( 'id' ) ) );
 			}
 		}
 		else {
@@ -161,7 +176,9 @@ class NewsController extends BackController {
 			$id_comment     = $request->getData( 'id' );
 			$news_author    = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
 			$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
-			if ( ($comment_author != 'admin' && ($comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin()) || ($this->_app->user()->getStatus() == 'admin'))) {
+			if ( ( $comment_author != 'admin' && ( $comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin() )
+				   || ( $this->_app->user()->getStatus() == 'admin' ) )
+			) {
 				$formBuilder = new CommentFormBuilder( $comment );
 				$formBuilder->build( $this->_app->user(), $this->_managers->getManagerOf( 'Members' ) );
 				
@@ -186,10 +203,14 @@ class NewsController extends BackController {
 	 * @param HTTPRequest $request
 	 */
 	public function executeDeleteComment( HTTPRequest $request ) {
+		$this->run();
+		
 		$id_comment     = $request->getData( 'id' );
 		$news_author    = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
 		$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
-		if ( ($comment_author != 'admin' && ($comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin()) || ($this->_app->user()->getStatus() == 'admin'))) {
+		if ( ( $comment_author != 'admin' && ( $comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin() )
+			   || ( $this->_app->user()->getStatus() == 'admin' ) )
+		) {
 			$this->_managers->getManagerOf( 'Comments' )->delete( $request->getData( 'id' ) );
 			$this->_app->user()->setFlash( 'Le commentaire a bien été supprimé !' );
 			$this->_app->httpResponse()->redirect( '.' );

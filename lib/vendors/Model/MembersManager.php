@@ -50,4 +50,8 @@ abstract class MembersManager extends Manager {
 			throw new \RuntimeException( 'Le login existe déjà' );
 		}
 	}
+	
+	abstract public function getIdMemberFromLogin($login);
+	
+	abstract public function getLoginMemberFromId($id);
 }

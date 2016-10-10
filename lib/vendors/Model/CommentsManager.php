@@ -13,6 +13,9 @@ use \Entity\Comment;
 
 abstract class CommentsManager extends Manager
 {
+	const COMMENT_STATE_VALID = 1;
+	const COMMENT_STATE_INVALID = 2;
+	
 	/** ajoute un commentaire dans la base
 	 * @param Comment $comment
 	 */
@@ -75,5 +78,5 @@ abstract class CommentsManager extends Manager
 	 *
 	 * @return string
 	 */
-	abstract public function getCommentAuthorFromId($id);
+	//abstract public function getCommentAuthorFromId($id);
 }

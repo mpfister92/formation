@@ -19,7 +19,7 @@ class MembersManagerPDO extends MembersManager {
 	 * @return bool
 	 */
 	public function getMember( $login, $password ) {
-		$sql = 'SELECT COUNT(*)
+		$sql = 'SELECT NMC_id AS id,NMC_login AS login,NMC_password AS password,NMC_email AS email,NMC_fk_NMY AS user_type
 				FROM t_new_memberc
 				WHERE NMC_login = :login
 				AND NMC_password = :password';
@@ -31,8 +31,11 @@ class MembersManagerPDO extends MembersManager {
 		
 		$requete->execute();
 		
-		$count = $requete->fetchColumn();
-		return ( 1 == $count );
+		$requete->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\Member' );
+		
+		if ( $member = $requete->fetch() ) {
+			return $member;
+		}
 	}
 	
 	/** retourne vrai s'il existe un membre qui a le login passé en paramètre
@@ -79,7 +82,7 @@ class MembersManagerPDO extends MembersManager {
 		
 		$requete->execute();
 		
-		return (true == $requete->fetch());
+		return ( true == $requete->fetch() );
 	}
 	
 	/** Ajoute un membre à la base de données
@@ -90,13 +93,42 @@ class MembersManagerPDO extends MembersManager {
 		$sql = 'INSERT INTO t_new_memberc SET 
 					NMC_login = :login, 
 					NMC_password = :password, 
-					NMC_email = :email ';
+					NMC_email = :email,
+					NMC_fk_NMY = :type';
 		
 		$requete = $this->_dao->prepare( $sql );
 		$requete->bindValue( ':login', $member->login() );
 		$requete->bindValue( ':password', $member->password() );
 		$requete->bindValue( ':email', $member->email() );
+		$requete->bindValue( ':type', $member->user_type() );
+		
 		
 		$requete->execute();
+	}
+	
+	public function getIdMemberFromLogin( $login ) {
+		$sql = 'SELECT NMC_id AS id
+				FROM t_new_memberc
+				WHERE NMC_login = :login';
+		
+		$requete = $this->_dao->prepare( $sql );
+		$requete->bindValue( ':login', $login );
+		
+		$requete->execute();
+		
+		return ( $requete->fetchColumn() );
+	}
+	
+	public function getLoginMemberFromId($id){
+		$sql = 'SELECT NMC_login
+				FROM t_new_memberc
+				WHERE NMC_id = :id';
+		
+		$requete = $this->_dao->prepare($sql);
+		$requete->bindValue(':id',$id,\PDO::PARAM_INT);
+		
+		$requete->execute();
+		
+		return $requete->fetchColumn();
 	}
 }

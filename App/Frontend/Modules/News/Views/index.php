@@ -1,5 +1,3 @@
-<h1><?php echo $user->getLogin() ?> sur <?php echo $device_type ?></h1>
-
 <?php
 if ( !empty( $listeNews ) ) {
 	foreach ( $listeNews as $news ) {

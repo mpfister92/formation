@@ -13,7 +13,7 @@ use \OCFram\USer;
 
 class CommentFormBuilder extends FormBuilder {
 	public function build(User $user = null, Manager $manager = null) {
-		if(!$user->getLogin() || $user->getStatus()== 'admin') {
+		if(!$user->getLogin()) {
 			$this->_form->add( new StringField( [
 				'label'      => 'Auteur',
 				'name'       => 'auteur',

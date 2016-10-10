@@ -12,18 +12,6 @@ use \OCFram\USer;
 
 class NewsFormBuilder extends FormBuilder {
 	public function build(User $user = null,Manager $manager = null) {
-		if($user->getStatus() == 'admin') {
-			$this->_form->add( new StringField( [
-				'label'      => 'Auteur',
-				'name'       => 'auteur',
-				'maxLength'  => 20,
-				'validators' => [
-					new MaxLengthValidator( 'L\'auteur spécifié est trop long', 20 ),
-					new NotNullValidator( 'Merci de spécifier un auteur' ),
-				],
-			] ) );
-		}
-		
 		$this->_form->add( new StringField( [
 			'label'      => 'Titre',
 			'name'       => 'titre',

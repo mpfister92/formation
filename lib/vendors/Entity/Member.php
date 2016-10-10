@@ -5,7 +5,7 @@ namespace Entity;
 use \OCFram\Entity;
 
 class Member extends Entity {
-	protected $login, $password, $email, $password_confirmation, $email_confirmation;
+	protected $login, $password, $email, $password_confirmation, $email_confirmation,$user_type;
 	const LOGIN_INVALIDE    = 1;
 	const EMAIL_INVALIDE    = 2;
 	const PASSWORD_INVALIDE = 3;
@@ -37,6 +37,10 @@ class Member extends Entity {
 	
 	public function email_confirmation() {
 		return $this->email_confirmation;
+	}
+	
+	public function user_type() {
+		return $this->user_type;
 	}
 	
 	/** SETTERS */
@@ -74,5 +78,9 @@ class Member extends Entity {
 			$this->errors[] = self::EMAIL_INVALIDE;
 		}
 		$this->email_confirmation = $email;
+	}
+	
+	public function setUser_Type($type){
+		$this->user_type = $type;
 	}
 }

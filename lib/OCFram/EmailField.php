@@ -14,6 +14,9 @@ class EmailField extends Field {
 		
 		$widget .= '<label>' . $this->label() . '</label><input type = "email" name="' . $this->_name . '"';
 		
+		if ( !empty( $this->_value ) ) {
+			$widget .= ' value="' . htmlspecialchars( $this->value(),ENT_QUOTES ) . '"';
+		}
 		
 		$widget .= ' />';
 		

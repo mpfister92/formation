@@ -13,12 +13,15 @@ class NewsManagerPDO extends NewsManager {
 	 *
 	 * @return News[]
 	 */
-	public function getList( $debut = -1, $limite = -1, $name = null ) {
-		$sql = 'SELECT NNC_id AS id,NNC_auteur AS auteur,NNC_titre AS titre,NNC_contenu AS contenu,NNC_dateAjout AS dateAjout,NNC_dateModif AS dateModif
-				FROM t_new_newsc';
+	public function getList( $debut = -1, $limite = -1, $id = null ) {
 		
-		if ( $name != null ) {
-			$sql .= ' WHERE NNC_auteur = :auteur';
+		$sql = 'SELECT NNC_id AS id,NMC_login AS auteur,NNC_titre AS titre,NNC_contenu AS contenu,NNC_dateAjout AS dateAjout,NNC_dateModif AS dateModif
+				FROM t_new_newsc
+				INNER JOIN t_new_memberc ON NNC_fk_NMC = NMC_id
+				WHERE NNC_fk_NNE = :state';
+		
+		if ( $id != null ) {
+			$sql .= ' AND NNC_fk_NMC = :id';
 		}
 		
 		if ( $debut != -1 || $limite != -1 ) {
@@ -26,7 +29,10 @@ class NewsManagerPDO extends NewsManager {
 		}
 		
 		$requete = $this->_dao->prepare( $sql );
-		$requete->bindValue( ':auteur', $name );
+		if ( null !== $id ) {
+			$requete->bindValue( ':id', $id );
+		}
+		$requete->bindValue( ':state', parent::NEWS_STATE_VALID, \PDO::PARAM_INT );
 		$requete->execute();
 		
 		$requete->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\News' );
@@ -41,9 +47,6 @@ class NewsManagerPDO extends NewsManager {
 			$news->setDateModif( new \DateTime( $news->dateModif() ) );
 		}
 		
-		//var_dump($listeNews);
-		//die();
-		
 		$requete->closeCursor();
 		
 		return $listeNews;
@@ -56,7 +59,7 @@ class NewsManagerPDO extends NewsManager {
 	 * @return News
 	 */
 	public function getNews( $id ) {
-		$sql = 'SELECT NNC_id AS id,NNC_auteur AS auteur,NNC_titre AS titre,NNC_contenu AS contenu,NNC_dateAjout AS dateAjout,NNC_dateModif AS dateModif
+		$sql = 'SELECT NNC_id AS id,NNC_fk_NMC AS auteur,NNC_titre AS titre,NNC_contenu AS contenu,NNC_dateAjout AS dateAjout,NNC_dateModif AS dateModif
                 FROM t_new_newsc
                 WHERE NNC_id = :id';
 		
@@ -83,16 +86,20 @@ class NewsManagerPDO extends NewsManager {
 	 *
 	 * @return int
 	 */
-	public function countNews( $name = null ) {
+	public function countNews( $id = null ) {
 		$sql = 'SELECT COUNT(*)
-                FROM t_new_newsc';
+                FROM t_new_newsc
+                WHERE NNC_fk_NNE = :state';
 		
-		if ( $name != null ) {
-			$sql .= ' WHERE NNC_auteur = :auteur';
+		if ( isset($id ) ) {
+			$sql .= ' AND NNC_fk_NMC = :id';
 		}
 		
 		$requete = $this->_dao->prepare( $sql );
-		$requete->bindValue( ':auteur', $name );
+		if(null !== $id) {
+			$requete->bindValue( ':id', $id );
+		}
+		$requete->bindValue( ':state', parent::NEWS_STATE_VALID);
 		$requete->execute();
 		$count = $requete->fetchColumn();
 		
@@ -105,16 +112,18 @@ class NewsManagerPDO extends NewsManager {
 	 */
 	protected function add( News $news ) {
 		$sql = 'INSERT INTO t_new_newsc SET 
-					NNC_auteur = :auteur,
+					NNC_fk_NMC = :id,
 					NNC_titre = :titre,
 					NNC_contenu = :contenu, 
 					NNC_dateAjout = NOW(),
-					NNC_dateModif = NOW() ';
+					NNC_dateModif = NOW(),
+					NNC_fk_NNE = :state';
 		
 		$request = $this->_dao->prepare( $sql );
-		$request->bindValue( ':auteur', $news->auteur() );
+		$request->bindValue( ':id', $news->auteur() );
 		$request->bindValue( ':titre', $news->titre() );
 		$request->bindValue( ':contenu', $news->contenu() );
+		$request->bindValue( ':state', parent::NEWS_STATE_VALID );
 		
 		$request->execute();
 	}
@@ -125,7 +134,7 @@ class NewsManagerPDO extends NewsManager {
 	 */
 	protected function modify( News $news ) {
 		$sql = 'UPDATE t_new_newsc SET 
-					NNC_auteur = :auteur,
+					NNC_fk_NMC = :auteur,
 					NNC_titre = :titre,
 					NNC_contenu = :contenu,
 					NNC_dateModif = NOW()
@@ -145,26 +154,34 @@ class NewsManagerPDO extends NewsManager {
 	 * @param int $id
 	 */
 	public function delete( $id ) {
-		$sql = 'DELETE FROM t_new_newsc
-					WHERE NNC_id = ' . (int)$id;
-		
-		$request = $this->_dao->exec( $sql );
-	}
-	
-	/** retourne le login de la personne qui a écrit la news
-	 * @param int $id
-	 * @return string $result
-	 */
-	public function getLoginFromNewsId($id){
-		$sql = 'SELECT NNC_auteur
-				FROM t_new_newsc
+		$sql = 'UPDATE t_new_newsc SET
+					NNC_fk_NNE = :state
 				WHERE NNC_id = :id';
 		
 		$requete = $this->_dao->prepare($sql);
-		$requete->bindValue('id',$id, \PDO::PARAM_INT);
+		$requete->bindValue(':state',parent::NEWS_STATE_INVALID);
+		$requete->bindValue(':id',$id,\PDO::PARAM_INT);
+		
+		$requete->execute();
+	}
+	
+	/** retourne le login de la personne qui a écrit la news
+	 *
+	 * @param int $id
+	 *
+	 * @return string $result
+	 */
+	public function getLoginFromNewsId( $id ) {
+		$sql = 'SELECT NMC_login
+				FROM t_new_newsc
+				INNER JOIN t_new_memberc ON NMC_id = NNC_fk_NMC
+				WHERE NNC_id = :id';
+		
+		$requete = $this->_dao->prepare( $sql );
+		$requete->bindValue( 'id', $id, \PDO::PARAM_INT );
 		
 		$requete->execute();
 		
-		return ($result = $requete->fetchColumn());
+		return ( $result = $requete->fetchColumn() );
 	}
 }

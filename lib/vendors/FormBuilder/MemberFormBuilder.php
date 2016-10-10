@@ -63,6 +63,7 @@ class MemberFormBuilder extends FormBuilder {
 			'name'       => 'email',
 			'maxLength'  => 50,
 			'validators' => [
+				new MaxLengthValidator('L\'e-mail specifié est trop long',50),
 				new UniqueValidator( 'Cet e-mail existe déjà !', $manager, 'existsMemberUsingEmail' ),
 				new NotNullValidator( 'Merci de renseigner un E-mail' ),
 				new EmailValidator('E-mail invalide ! '),
@@ -76,9 +77,10 @@ class MemberFormBuilder extends FormBuilder {
 			'name'       => 'email_confirmation',
 			'maxLength'  => 50,
 			'validators' => [
+				new MaxLengthValidator('L\'email specifié est trop long',50),
 				new NotNullValidator( 'Merci de confirmer votre E-mail' ),
-				new ConfirmationValidator( 'Erreur : e-mails différents', $email_field),
 				new EmailValidator('E-mail invalide ! '),
+				new ConfirmationValidator( 'Erreur : e-mails différents', $email_field),
 			],
 		] ) );
 	}
