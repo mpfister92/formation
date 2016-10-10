@@ -15,3 +15,7 @@
 
 # 2.1 - Two types of user. 
 * The users who subrscribe with subscription form are now simple writers. They are not a full administrator and they can only edit their news.
+
+# 3 - CSS : Fix the CSS error when text is too long.
+* Try to enter a very long text in title and text of a News and observe the result. (Long text without space)
+* Fix visual problem by adding somes CSS rules.
