@@ -1,53 +1,38 @@
-<?php use OCFram\Linking; ?>
-
 <p>Par <em><?= $news_author ?></em>, le <?= $news[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?></p>
 <h2><?= $news[ 'titre' ] ?></h2>
 <p><?= nl2br( $news[ 'contenu' ] ) ?></p>
 
 <?php if ( $news[ 'dateAjout' ] != $news[ 'dateModif' ] ) { ?>
 	<p style="text-align: right;">
-		<small><em>Modifiée le <?= $news[ 'dateModif' ]->format( 'd/m/Y à H\hi') ?></em></small>
+		<small><em>Modifiée le <?= $news[ 'dateModif' ]->format( 'd/m/Y à H\hi' ) ?></em></small>
 	</p>
 <?php } ?>
 
 
-<p><a href="commenter-<?= $news[ 'id' ] ?>.html">Ajouter un commentaire</a></p>
+<p><a href="<?= $add_comment ?>">Ajouter un commentaire</a></p>
 
 
-<?php
-if ( empty( $comments ) ) {
-	?>
+<?php if ( empty( $comments ) ): ?>
 	<p>Aucun commentaire n'a encore été posté. Soyez le premier à en laisser un !</p>
-	<?php
-}
+<?php endif; ?>
 
-
-foreach ( $comments as $comment ) {
-	?>
+<?php foreach ( $links as $author_date_content => $link ): ?>
+	<?php $string_array = explode( '|', $author_date_content ) ?>
 	<fieldset>
+		<legend>
 			Posté par
 			<strong>
-				<?php if ( htmlentities($comment[ 'auteur' ]) != null ): ?>
-					<?= htmlspecialchars( $comment[ 'auteur' ] ) ?>
-				<?php else: ?>
-					<?= htmlspecialchars($manager->getLoginMemberFromId($comment['member'])) ?>
-				<?php endif; ?>
+				<?= $string_array[ 0 ] ?>
 			</strong>
-			le <?= $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) ?>
-			<?php if ( $user->isAuthenticated() ): ?>
-				<?php if ( $user->getStatus() == 'admin' ): ?>
-					 <a href=" <?= Linking::provideRoute('Backend','News','updateComment',['id' => $comment['id']]) ?>">Modifier</a>  |
-					 <a href=" <?= Linking::provideRoute('Backend','News','deleteComment',['id' => $comment['id']]) ?>">Supprimer</a>
-				<?php elseif ( $comment[ 'auteur' ] != 'admin' && ( $user->getLogin() == $comment[ 'auteur' ] || $user->getLogin() == $news_author || $user->getStatus() == 'admin' ) ): ?>
-					<a href=" <?= Linking::provideRoute('Backend','News','updateComment',['id' => $comment['id']]) ?>">Modifier</a>  |
-					<a href=" <?= Linking::provideRoute('Backend','News','deleteComment',['id' => $comment['id']]) ?>">Supprimer</a>
+			le <?= $string_array[ 1 ] ?>
+			<?php foreach ( $link as $action => $item ): ?>
+				<?php if ( $item != null ): ?>
+					<a href="<?= $item ?>"><?= $action ?></a>
 				<?php endif; ?>
-			<?php endif; ?>
+			<?php endforeach; ?>
 		</legend>
-		<p><?= nl2br( htmlspecialchars( $comment[ 'contenu' ] ) ) ?></p>
+		<p><?= nl2br( htmlspecialchars( $string_array[ 2 ] ) ) ?></p>
 	</fieldset>
-	<?php
-}
-?>
+<?php endforeach; ?>
 
-<p><a href="commenter-<?= $news[ 'id' ] ?>.html">Ajouter un commentaire</a></p>
+<p><a href="<?= $add_comment ?>">Ajouter un commentaire</a></p>

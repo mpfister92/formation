@@ -11,7 +11,6 @@ use \Entity\Comment;
 use \FormBuilder\NewsFormBuilder;
 use \OCFram\FormHandler;
 
-//require( 'C:\Users\mpfister\Desktop\UwAmp\www\formation\App\AppController.php');
 
 class NewsController extends BackController {
 	use AppController;
@@ -28,15 +27,24 @@ class NewsController extends BackController {
 		$manager = $this->_managers->getManagerOf( 'News' );
 		
 		if ( $this->_app->user()->getStatus() == 'admin' ) {
-			$this->_page->addVar( 'listeNews', $manager->getList() );
-			$this->_page->addVar( 'nombreNews', $manager->countNews() );
+			$list_news   = $manager->getList();
+			$number_news = $manager->countNews();
 		}
 		else {
-			if ( $this->_app->user()->getStatus() == 'member' ) {
-				$this->_page->addVar( 'listeNews', $manager->getList( -1, -1, $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) ) );
-				$this->_page->addVar( 'nombreNews', $manager->countNews( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) ) );
-			}
+			$list_news   = $manager->getList( -1, -1, $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
+			$number_news = $manager->countNews( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
 		}
+		
+		$this->_page->addVar( 'listeNwes', $list_news );
+		$this->_page->addVar( 'nombreNews', $number_news );
+		
+		$links = [];
+		foreach ( $list_news as $news ) {
+			$links[ $news[ 'auteur' ] . '|' . $news[ 'titre' ] . '|' . $news[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) . '|' . $news[ 'dateModif' ]->format( 'd/m/Y à H\hi' ) ] = $this->app()
+																																													  ->router()
+																																													  ->provideRoute( 'Backend', 'News', 'update', [ 'id' => $news[ 'id' ] ] );
+		}
+		
 	}
 	
 	/** insertion d'une news

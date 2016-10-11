@@ -8,6 +8,7 @@ abstract class Application {
 	protected $_name;
 	protected $_user;
 	protected $_config;
+	protected $_router;
 	
 	public function __construct() {
 		$this->_httpRequest  = new HTTPRequest( $this );
@@ -18,29 +19,10 @@ abstract class Application {
 	}
 	
 	public function getController() {
-		$router = new Router;
-		
-		$xml = new \DOMDocument;
-		$xml->load( __DIR__ . '/../../App/' . $this->_name . '/Config/routes.xml' );
-		
-		$routes = $xml->getElementsByTagName( 'route' );
-		
-		// On parcourt les routes du fichier XML.
-		foreach ( $routes as $route ) {
-			$vars = [];
-			
-			// On regarde si des variables sont présentes dans l'URL.
-			if ( $route->hasAttribute( 'vars' ) ) {
-				$vars = explode( ',', $route->getAttribute( 'vars' ) );
-			}
-			
-			// On ajoute la route au routeur.
-			$router->addRoute( new Route( $route->getAttribute( 'url' ), $route->getAttribute( 'module' ), $route->getAttribute( 'action' ), $vars ) );
-		}
-		
+		$this->_router = new Router( $this );
 		try {
 			// On récupère la route correspondante à l'URL.
-			$matchedRoute = $router->getRoute( $this->_httpRequest->requestURI() );
+			$matchedRoute = $this->_router->getRoute( $this->_httpRequest->requestURI(),$this->_name );
 		}
 		catch ( \RuntimeException $e ) {
 			// Si aucune route ne correspond, c'est que la page demandée n'existe pas.
@@ -77,6 +59,10 @@ abstract class Application {
 	
 	public function config() {
 		return $this->_config;
+	}
+	
+	public function router(){
+		return $this->_router;
 	}
 }
 

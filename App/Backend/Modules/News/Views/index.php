@@ -1,6 +1,6 @@
-<?php use OCFram\Linking; ?>
+<?php use OCFram\Router; ?>
 
-<p style="text-align: center">Il y a actuellement <?= $nombreNews ?> news. En voici la liste :</p>
+<p style="text-align: center">Il y a actuellement <?= $number_news ?> news. En voici la liste :</p>
 
 <table>
 	<tr>
@@ -10,12 +10,13 @@
 		<th>Dernière modification</th>
 		<th>Action</th>
 	</tr>
-	<?php foreach ( $listeNews as $news ): ?>
-		<tr><td><?= $news[ 'auteur' ] ?>
-		</td><td><?= $news[ 'titre' ] ?>
-		</td><td>le <?= $news[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?>
-		</td><td><?= ( $news[ 'dateAjout' ] == $news[ 'dateModif' ] ? '-' : 'le ' . $news[ 'dateModif' ]->format( 'd/m/Y à H\hi' ) ) ?>
-		</td><td><a href="<?= Linking::provideRoute('Backend','News','update',['id' => $news['id']]) ?>"><img src="/images/update.png" alt="Modifier" /></a>
-		<a href="<?= Linking::provideRoute('Backend','News','delete',['id' => $news[ 'id' ]]) ?>"><img src="/images/delete.png" alt="Supprimer" /></a></td></tr>
+	<?php foreach ( $links as $auteur_titre_ajout_modif => $link ): ?>
+		<?php $string_array = explode('|',$auteur_titre_ajout_modif) ?>
+		<tr><td><?= $string_array[0] ?>
+		</td><td><?= $string_array[1] ?>
+		</td><td>le <?= $string_array[2] ?>
+		</td><td><?= ( $string_array[2] == $string_array[3] ? '-' : 'le ' . $string_array[3] ) ?>
+		</td><td><a href="<?= $link ?>"><img src="/images/update.png" alt="Modifier" /></a>
+		<a href="<?= $link ?>"><img src="/images/delete.png" alt="Supprimer" /></a></td></tr>
 	<?php endforeach; ?>
 </table>

@@ -8,11 +8,10 @@ use \OCFram\HTTPRequest;
 
 
 class ConnexionController extends BackController {
-	const USER_TYPE_MEMBER = 2;
-	const USER_TYPE_ADMIN = 1;
-	
 	use AppController;
 	
+	const USER_TYPE_MEMBER = 2;
+	const USER_TYPE_ADMIN = 1;
 	/** gestion de la connexion et setting de la session (admin/member)
 	 *
 	 * @param HTTPRequest $request

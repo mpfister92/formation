@@ -1,20 +1,12 @@
-<?php use OCFram\Linking; ?>
+<?php if ( !empty( $links ) ): ?>
+	<?php foreach ( $links as $titre_and_contenu => $link ): ?>
+		<?php $string_array = explode('|',$titre_and_contenu) ?>
+		<h2><a href="<?= $link ?>"><?= $string_array[0] ?></a></h2>
+		<p><?= nl2br( $string_array[1] ) ?></p>
+	<?php endforeach; ?>
 
-<?php
-if ( !empty( $listeNews ) ) {
-	foreach ( $listeNews as $news ) {
-		?>
-		<h2><a href="<?= Linking::provideRoute('Frontend','News','show',['id' => $news['id']]) ?>"><?= $news['titre'] ?></a></h2>
-		<p><?= nl2br( $news[ 'contenu' ] ) ?></p>
-		<?php
-	}
-}
-
-else {
-	?>
+<?php else: ?>
 	<h2>Aucune news pour le moment !</h2>
-	<?php
-}
-?>
+<?php endif; ?>
 
 

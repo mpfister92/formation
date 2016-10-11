@@ -119,15 +119,26 @@ class MembersManagerPDO extends MembersManager {
 		return ( $requete->fetchColumn() );
 	}
 	
-	public function getLoginMemberFromId($id){
+	public function getLoginMemberFromId( $id ) {
 		$sql = 'SELECT NMC_login
 				FROM t_new_memberc
 				WHERE NMC_id = :id';
 		
-		$requete = $this->_dao->prepare($sql);
-		$requete->bindValue(':id',$id,\PDO::PARAM_INT);
+		$requete = $this->_dao->prepare( $sql );
+		$requete->bindValue( ':id', $id, \PDO::PARAM_INT );
 		
 		$requete->execute();
+		
+		return $requete->fetchColumn();
+	}
+	
+	public function getStatusMemberFromId( $id ) {
+		$sql = 'SELECT NMC_fk_NMY 
+				FROM t_new_memberc
+				WHERE NMC_id = :id';
+		
+		$requete = $this->_dao->prepare( $sql );
+		$requete->bindValue( ':id', $id, \PDO::PARAM_INT );
 		
 		return $requete->fetchColumn();
 	}

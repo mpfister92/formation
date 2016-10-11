@@ -5,7 +5,7 @@ namespace App;
 use Composer\Package\Link;
 use \Detection\MobileDetect;
 use OCFram\Application;
-use OCFram\Linking;
+
 
 /**
  * Trait AppController
@@ -28,24 +28,27 @@ trait AppController {
 		
 		if ( $user->isAuthenticated() ) {
 			if ( $user->getStatus() == 'admin' ) {
-				$menu[ 'Admin' ] = Linking::provideRoute('Backend','News','index',[]);
+				$menu[ 'Admin' ] = $this->app()->router()->provideRoute( 'Backend', 'News', 'index', [] );
 			}
 			if ( $user->getStatus() == 'member' ) {
-				$menu[ 'Vos news' ] = Linking::provideRoute('Backend','News','index',[]);
+				$menu[ 'Vos news' ] = $this->app()->router()->provideRoute( 'Backend', 'News', 'index', [] );
 			}
-			$menu [ 'Ajouter une news' ] = Linking::provideRoute('Backend','News','insert',[]);
-			$menu[ 'Deconnexion' ]       = Linking::provideRoute('Backend','Connexion','deconnexion',[]);
+			$menu [ 'Ajouter une news' ] = $this->app()->router()->provideRoute( 'Backend', 'News', 'insert', [] );
+			$menu[ 'Deconnexion' ]       = $this->app()->router()->provideRoute( 'Backend', 'Connexion', 'deconnexion', [] );
 		}
 		else {
-			$menu[ 'Connexion' ]   = Linking::provideRoute('Backend','Connexion','index',[]);
-			$menu[ 'S\'inscrire' ] = Linking::provideRoute('Frontend','Connexion','inscription',[]);
+			$menu[ 'Connexion' ] = $this->app()->router()->provideRoute( 'Backend', 'Connexion', 'index', [] );
+			//var_dump($this->app()->router()->provideRoute('Backend','Connexion','index',[]));
+			//die();
+			$menu[ 'S\'inscrire' ] = $this->app()->router()->provideRoute( 'Frontend', 'Connexion', 'inscription', [] );
 		}
 		
-		$this->page()->addVar('menu',$menu);
+		$this->page()->addVar( 'menu', $menu );
 	}
 	
 	/**
 	 * Check if the connected user is an administrator
+	 *
 	 * @return bool
 	 */
 	public function loggetUserIsAdmin() {

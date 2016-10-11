@@ -14,7 +14,7 @@ use \OCFram\FormHandler;
 
 class NewsController extends BackController {
 	use AppController;
-	
+	const MEMBER_STATUS_ADMIN = 1;
 	/** affichage des news sur la page d'accueil
 	 *
 	 * @param HTTPRequest $request
@@ -34,13 +34,16 @@ class NewsController extends BackController {
 		$listeNews = $manager->getList( 0, $nbNews );
 		
 		foreach ( $listeNews as $news ) {
-			//if ( strlen( $news->contenu() ) > $nbCaracteres ) {
-				$debut = mb_strimwidth($news->contenu(),0,$nbCaracteres,"...");
-				$news->setContenu( $debut );
-			//}
+			$debut = mb_strimwidth( $news->contenu(), 0, $nbCaracteres, "..." );
+			$news->setContenu( $debut );
 		}
-		// On ajoute la variable $listeNews à la vue.
-		$this->_page->addVar( 'listeNews', $listeNews );
+		
+		//on passe à la vue les informations de lien, de titre et de contenu
+		$links = [];
+		foreach ( $listeNews as $news ) {
+			$links[ $news[ 'titre' ] . '|' . $news[ 'contenu' ] ] = $this->app()->router()->provideRoute( 'Frontend', 'News', 'show', [ 'id' => $news[ 'id' ] ] );
+		}
+		$this->_page->addVar( 'links', $links );
 	}
 	
 	/** affichage d'une news est ses commentaires
@@ -59,10 +62,53 @@ class NewsController extends BackController {
 		}
 		
 		$this->_page->addVar( 'title', $news->titre() );
+		//passage de la news
 		$this->_page->addVar( 'news', $news );
-		$this->_page->addVar( 'comments', $this->_managers->getManagerOf( 'Comments' )->getListOf( $news->id() ) );
-		$this->_page->addVar( 'news_author', $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $news->id() ) );
-		$this->_page->addVar('manager',$this->_managers->getManagerOf('Members'));
+		//passage de la liste des commentaires
+		$comments = $this->_managers->getManagerOf( 'Comments' )->getListOf( $news->id() );
+		$this->_page->addVar( 'comments', $comments );
+		//passage du nom de l'auteur de la news
+		$news_author = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $news->id() );
+		$this->_page->addVar( 'news_author', $news_author );
+		
+		//passage des liens
+		$links = array();
+		foreach ( $comments as $comment ) {
+			if ( $comment[ 'member' ] != null ) {
+				$comment_author = $this->_managers->getManagerOf( 'Members' )->getLoginMemberFromId( $comment[ 'member' ] );
+			}
+			else {
+				$comment_author = $comment[ 'auteur' ];
+			}
+			if ( $this->getUser()->isAuthenticated() ) {
+				if ( $this->getUser()->getStatus() == 'admin' ) {
+					$links[ $comment_author . '|' . $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) . '|' . $comment[ 'contenu' ] ][] = $this->app()->router()
+																																		  ->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $comment[ 'id' ] ] );
+					$links[ $comment_author . '|' . $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) . '|' . $comment[ 'contenu' ] ][] = $this->app()->router()
+																																		  ->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $comment[ 'id' ] ] );
+				}
+				else {
+					if ( $comment[ 'member' ] != null ) {
+						$status = $this->_managers->getManagerOf( 'Members' )->getStatusMemberFromId( $comment[ 'member' ] );
+						if ( $status != self::MEMBER_STATUS_ADMIN
+							 && ( $this->getUser()->getLogin() == $comment[ 'auteur' ] || $this->getUser()->getLogin() == $news_author
+								  || $this->getUser()->getStatus() == 'admin' )
+						) {
+							$links[ $comment_author . '|' . $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) . '|' . $comment[ 'contenu' ] ][] = $this->app()->router()
+																																				  ->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $comment[ 'id' ] ] );
+							$links[ $comment_author . '|' . $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) . '|' . $comment[ 'contenu' ] ][] = $this->app()->router()
+																																				  ->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $comment[ 'id' ] ] );
+						}
+					}
+				}
+			}
+			else {
+				$links[ $comment_author . '|' . $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) . '|' . $comment[ 'contenu' ] ][] = null;
+			}
+		}
+		$this->_page->addVar( 'links', $links );
+		//var_dump($this->app()->router()->routes());
+		$this->_page->addVar('add_comment',$this->app()->router()->provideRoute('Frontend','News','insertComment',['id' => $news['id']]));
 	}
 	
 	/** insertion d'un commentaire
@@ -85,7 +131,7 @@ class NewsController extends BackController {
 					'news'    => $request->getData( 'news' ),
 					'contenu' => $request->postData( 'contenu' ),
 				] );
-				$comment->setMember( $this->_managers->getManagerOf('Members')->getIdMemberFromLogin($this->getUser()->getLogin()) );
+				$comment->setMember( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
 			}
 		}
 		else {
