@@ -11,7 +11,7 @@ namespace Entity;
 use \OCFram\Entity;
 
 class Comment extends Entity {
-	protected $news, $auteur, $contenu, $date, $state, $member;
+	protected $fk_NNC, $auteur, $contenu, $date, $fk_NCE, $fk_NMC;
 	const AUTEUR_INVALIDE = 1;
 	const TEXT_INVALIDE   = 2;
 	
@@ -20,13 +20,13 @@ class Comment extends Entity {
 	 * @return bool
 	 */
 	public function isValid() {
-		return !( ( empty( $this->auteur ) && empty( $this->member ) ) || empty( $this->contenu ) );
+		return (!empty( $this->contenu ) || (!empty($this->auteur) || !empty($this->fk_NMC)));
 	}
 	
 	/** SETTERS */
 	
-	public function setNews( $news ) {
-		$this->news = (int)$news;
+	public function setFk_NNC( $fk_NNC ) {
+		$this->fk_NNC = (int) $fk_NNC;
 	}
 	
 	public function setAuteur( $auteur ) {
@@ -47,18 +47,18 @@ class Comment extends Entity {
 		$this->date = $date;
 	}
 	
-	public function setState( $state ) {
-		$this->state = $state;
+	public function setFk_NCE( $fk_NCE ) {
+		$this->fk_NNE = $fk_NCE;
 	}
 	
-	public function setMember( $member ) {
-		$this->member = $member;
+	public function setFk_NMC( $fk_NMC ) {
+		$this->fk_NMC = $fk_NMC;
 	}
 	
 	/** GETTERS */
 	
-	public function news() {
-		return $this->news;
+	public function fk_NNC() {
+		return $this->fk_NNC;
 	}
 	
 	public function auteur() {
@@ -73,11 +73,11 @@ class Comment extends Entity {
 		return $this->date;
 	}
 	
-	public function state() {
-		return $this->state;
+	public function fk_NCE() {
+		return $this->fk_NCE;
 	}
 	
-	public function member() {
-		return $this->member;
+	public function fk_NMC() {
+		return $this->fk_NMC;
 	}
 }

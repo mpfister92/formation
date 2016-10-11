@@ -40,6 +40,7 @@ trait AppController {
 			$menu[ 'Connexion' ] = $this->app()->router()->provideRoute( 'Backend', 'Connexion', 'index', [] );
 			//var_dump($this->app()->router()->provideRoute('Backend','Connexion','index',[]));
 			//die();
+			
 			$menu[ 'S\'inscrire' ] = $this->app()->router()->provideRoute( 'Frontend', 'Connexion', 'inscription', [] );
 		}
 		

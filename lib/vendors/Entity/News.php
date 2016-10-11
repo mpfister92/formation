@@ -12,7 +12,7 @@ namespace Entity;
 use \OCFram\Entity;
 
 class News extends Entity {
-	protected $auteur, $titre, $contenu, $dateAjout, $dateModif, $state;
+	protected $fk_NMC, $titre, $contenu, $dateAjout, $dateModif, $fk_NNE, $Member;
 	const AUTEUR_INVALIDE  = 1;
 	const TITRE_INVALIDE   = 2;
 	const CONTENU_INVALIDE = 3;
@@ -22,16 +22,16 @@ class News extends Entity {
 	 * @return bool
 	 */
 	public function isValid() {
-		return !( empty( $this->auteur ) || empty( $this->titre ) || empty( $this->contenu ) );
+		return !( empty( $this->fk_NMC ) || empty( $this->titre ) || empty( $this->contenu ) );
 	}
 	
 	/** SETTERS */
 	
-	public function setAuteur( $auteur ) {
-		if ( empty( $auteur ) ) {
+	public function setFk_NMC( $fk_NMC ) {
+		if ( empty( $fk_NMC ) ) {
 			$this->errors[] = self::AUTEUR_INVALIDE;
 		}
-		$this->auteur = $auteur;
+		$this->fk_NMC = $fk_NMC;
 	}
 	
 	public function setTitre( $titre ) {
@@ -56,14 +56,18 @@ class News extends Entity {
 		$this->dateModif = $datemodif;
 	}
 	
-	public function setState( $state ) {
-		$this->state = $state;
+	public function setFk_NNE( $state ) {
+		$this->fk_NNE = $state;
+	}
+	
+	public function setMember(Member $Member){
+		$this->Member = $Member;
 	}
 	
 	/** GETTERS */
 	
-	public function auteur() {
-		return $this->auteur;
+	public function fk_NMC() {
+		return $this->fk_NMC;
 	}
 	
 	public function titre() {
@@ -82,7 +86,11 @@ class News extends Entity {
 		return $this->dateModif;
 	}
 	
-	public function state() {
-		return $this->state;
+	public function fk_NNE() {
+		return $this->fk_NNE;
+	}
+	
+	public function member(){
+		return $this->Member;
 	}
 }

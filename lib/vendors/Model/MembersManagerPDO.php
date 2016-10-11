@@ -19,7 +19,7 @@ class MembersManagerPDO extends MembersManager {
 	 * @return bool
 	 */
 	public function getMember( $login, $password ) {
-		$sql = 'SELECT NMC_id AS id,NMC_login AS login,NMC_password AS password,NMC_email AS email,NMC_fk_NMY AS user_type
+		$sql = 'SELECT NMC_id AS id,NMC_login AS login,NMC_password AS password,NMC_email AS email,NMC_fk_NMY AS fk_NMY
 				FROM t_new_memberc
 				WHERE NMC_login = :login
 				AND NMC_password = :password';
@@ -31,6 +31,22 @@ class MembersManagerPDO extends MembersManager {
 		
 		$requete->execute();
 		
+		$requete->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\Member' );
+		
+		if ( $member = $requete->fetch() ) {
+			return $member;
+		}
+	}
+	
+	public function getMemberFromId($id){
+		$sql = 'SELECT NMC_id AS id,NMC_login AS login,NMC_password AS password,NMC_email AS email,NMC_fk_NMY AS fk_NMY
+				FROM t_new_memberc
+				WHERE NMC_id = :id';
+		
+		$requete = $this->_dao->prepare($sql);
+		
+		$requete->bindValue(':id',$id,\PDO::PARAM_INT);
+		$requete->execute();
 		$requete->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\Member' );
 		
 		if ( $member = $requete->fetch() ) {
@@ -120,7 +136,7 @@ class MembersManagerPDO extends MembersManager {
 	}
 	
 	public function getLoginMemberFromId( $id ) {
-		$sql = 'SELECT NMC_login
+		$sql = 'SELECT NMC_login AS login
 				FROM t_new_memberc
 				WHERE NMC_id = :id';
 		
@@ -133,12 +149,14 @@ class MembersManagerPDO extends MembersManager {
 	}
 	
 	public function getStatusMemberFromId( $id ) {
-		$sql = 'SELECT NMC_fk_NMY 
+		$sql = 'SELECT NMC_fk_NMY AS fk_NMY
 				FROM t_new_memberc
 				WHERE NMC_id = :id';
 		
 		$requete = $this->_dao->prepare( $sql );
 		$requete->bindValue( ':id', $id, \PDO::PARAM_INT );
+		
+		$requete->execute();
 		
 		return $requete->fetchColumn();
 	}

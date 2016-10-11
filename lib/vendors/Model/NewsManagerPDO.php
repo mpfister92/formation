@@ -15,9 +15,8 @@ class NewsManagerPDO extends NewsManager {
 	 */
 	public function getList( $debut = -1, $limite = -1, $id = null ) {
 		
-		$sql = 'SELECT NNC_id AS id,NMC_login AS auteur,NNC_titre AS titre,NNC_contenu AS contenu,NNC_dateAjout AS dateAjout,NNC_dateModif AS dateModif
+		$sql = 'SELECT NNC_id AS id,NNC_fk_NMC AS fk_NMC,NNC_titre AS titre,NNC_contenu AS contenu,NNC_dateAjout AS dateAjout,NNC_dateModif AS dateModif, NNC_fk_NNE as fk_NNE
 				FROM t_new_newsc
-				INNER JOIN t_new_memberc ON NNC_fk_NMC = NMC_id
 				WHERE NNC_fk_NNE = :state';
 		
 		if ( $id != null ) {

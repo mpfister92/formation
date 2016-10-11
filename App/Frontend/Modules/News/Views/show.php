@@ -1,10 +1,16 @@
-<p>Par <em><?= $news_author ?></em>, le <?= $news[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?></p>
-<h2><?= $news[ 'titre' ] ?></h2>
-<p><?= nl2br( $news[ 'contenu' ] ) ?></p>
+<?php
+/**
+ * @var \Entity\Comment[] $List_comments_a
+ */
+?>
 
-<?php if ( $news[ 'dateAjout' ] != $news[ 'dateModif' ] ) { ?>
+<p>Par <em><?= $news_author ?></em>, le <?= $News[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?></p>
+<h2><?= $News[ 'titre' ] ?></h2>
+<p><?= nl2br( $News[ 'contenu' ] ) ?></p>
+
+<?php if ( $News[ 'dateAjout' ] != $News[ 'dateModif' ] ) { ?>
 	<p style="text-align: right;">
-		<small><em>Modifiée le <?= $news[ 'dateModif' ]->format( 'd/m/Y à H\hi' ) ?></em></small>
+		<small><em>Modifiée le <?= $News[ 'dateModif' ]->format( 'd/m/Y à H\hi' ) ?></em></small>
 	</p>
 <?php } ?>
 
@@ -12,26 +18,22 @@
 <p><a href="<?= $add_comment ?>">Ajouter un commentaire</a></p>
 
 
-<?php if ( empty( $comments ) ): ?>
+<?php if ( empty( $List_comments_a ) ): ?>
 	<p>Aucun commentaire n'a encore été posté. Soyez le premier à en laisser un !</p>
 <?php endif; ?>
 
-<?php foreach ( $links as $author_date_content => $link ): ?>
-	<?php $string_array = explode( '|', $author_date_content ) ?>
+<?php foreach ( $List_comments_a as $Comment ): ?>
 	<fieldset>
 		<legend>
 			Posté par
 			<strong>
-				<?= $string_array[ 0 ] ?>
+				<?= $Comment['comment_author'] ?>
 			</strong>
-			le <?= $string_array[ 1 ] ?>
-			<?php foreach ( $link as $action => $item ): ?>
-				<?php if ( $item != null ): ?>
-					<a href="<?= $item ?>"><?= $action ?></a>
-				<?php endif; ?>
-			<?php endforeach; ?>
+			le <?= $Comment['date_formated'] ?>
+			<a href="<?= $Comment['link_update'] ?>">Modifier</a> -
+			<a href="<?= $Comment['link_delete'] ?>">Supprimer</a> -
 		</legend>
-		<p><?= nl2br( htmlspecialchars( $string_array[ 2 ] ) ) ?></p>
+		<p><?= nl2br( htmlspecialchars( $Comment['contenu'] ) ) ?></p>
 	</fieldset>
 <?php endforeach; ?>
 

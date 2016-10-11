@@ -14,7 +14,9 @@ use \OCFram\FormHandler;
 
 class NewsController extends BackController {
 	use AppController;
-	const MEMBER_STATUS_ADMIN = 1;
+	const MEMBER_STATUS_ADMIN  = 1;
+	const MEMBER_STATUS_MEMBER = 2;
+	
 	/** affichage des news sur la page d'accueil
 	 *
 	 * @param HTTPRequest $request
@@ -22,28 +24,26 @@ class NewsController extends BackController {
 	public function executeIndex( HTTPRequest $request ) {
 		$this->run();
 		
-		$nbNews       = $this->_app->config()->get( 'nombre_news' );
-		$nbCaracteres = $this->_app->config()->get( 'nombre_caracteres' );
+		$number_news       = $this->_app->config()->get( 'nombre_news' );
+		$number_characters = $this->_app->config()->get( 'nombre_caracteres' );
 		
-		$this->_page->addVar( 'title', 'Liste des ' . $nbNews . ' dernières news' );
+		$this->_page->addVar( 'title', 'Liste des ' . $number_news . ' dernières news' );
 		
 		//on récupère le manager des news
 		/** @var NewsManager $manager */
 		$manager = $this->_managers->getManagerOf( 'News' );
 		
-		$listeNews = $manager->getList( 0, $nbNews );
+		$List_news_a = $manager->getList( 0, $number_news );
 		
-		foreach ( $listeNews as $news ) {
-			$debut = mb_strimwidth( $news->contenu(), 0, $nbCaracteres, "..." );
-			$news->setContenu( $debut );
+		foreach ( $List_news_a as $News ) {
+			$debut = mb_strimwidth( $News->contenu(), 0, $number_characters, "..." );
+			$News->setContenu( $debut );
 		}
 		
-		//on passe à la vue les informations de lien, de titre et de contenu
-		$links = [];
-		foreach ( $listeNews as $news ) {
-			$links[ $news[ 'titre' ] . '|' . $news[ 'contenu' ] ] = $this->app()->router()->provideRoute( 'Frontend', 'News', 'show', [ 'id' => $news[ 'id' ] ] );
+		foreach ( $List_news_a as $News ) {
+			$News->link = $this->app()->router()->provideRoute( 'Frontend', 'News', 'show', [ 'id' => $News[ 'id' ] ] );
 		}
-		$this->_page->addVar( 'links', $links );
+		$this->_page->addVar( 'List_news_a', $List_news_a );
 	}
 	
 	/** affichage d'une news est ses commentaires
@@ -53,62 +53,57 @@ class NewsController extends BackController {
 	public function executeShow( HTTPRequest $request ) {
 		$this->run();
 		
-		$manager = $this->_managers->getManagerOf( 'News' );
+		$Manager = $this->_managers->getManagerOf( 'News' );
 		
-		$news = $manager->getNews( $request->getData( 'id' ) );
+		$News = $Manager->getNews( $request->getData( 'id' ) );
 		
-		if ( empty( $news ) ) {
+		if ( empty( $News ) ) {
 			$this->_app->httpResponse()->redirect404();
 		}
 		
-		$this->_page->addVar( 'title', $news->titre() );
-		//passage de la news
-		$this->_page->addVar( 'news', $news );
-		//passage de la liste des commentaires
-		$comments = $this->_managers->getManagerOf( 'Comments' )->getListOf( $news->id() );
-		$this->_page->addVar( 'comments', $comments );
-		//passage du nom de l'auteur de la news
-		$news_author = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $news->id() );
-		$this->_page->addVar( 'news_author', $news_author );
+		//liste des commentaires
+		$List_comments_a = $this->_managers->getManagerOf( 'Comments' )->getListOf( $News->id() );
 		
-		//passage des liens
-		$links = array();
-		foreach ( $comments as $comment ) {
-			if ( $comment[ 'member' ] != null ) {
-				$comment_author = $this->_managers->getManagerOf( 'Members' )->getLoginMemberFromId( $comment[ 'member' ] );
+		//nom de l'auteur de la news
+		$news_author = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $News->id() );
+				
+		foreach ( $List_comments_a as $Comment ) {
+			//recuperation du login de l'auteur du commentaire
+			if ( $Comment[ 'fk_NMC' ] != null ) {
+				$Comment->comment_author = $this->_managers->getManagerOf( 'Members' )->getLoginMemberFromId( $Comment[ 'fk_NMC' ] );
 			}
 			else {
-				$comment_author = $comment[ 'auteur' ];
+				$Comment->comment_author = $Comment[ 'auteur' ];
 			}
+			$Comment->date_formated = $Comment->date()->format( 'd/m/Y à H\hi' );
 			if ( $this->getUser()->isAuthenticated() ) {
 				if ( $this->getUser()->getStatus() == 'admin' ) {
-					$links[ $comment_author . '|' . $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) . '|' . $comment[ 'contenu' ] ][] = $this->app()->router()
-																																		  ->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $comment[ 'id' ] ] );
-					$links[ $comment_author . '|' . $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) . '|' . $comment[ 'contenu' ] ][] = $this->app()->router()
-																																		  ->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $comment[ 'id' ] ] );
+					$Comment->link_update = $this->app()->router()->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $Comment[ 'id' ] ] );
+					$Comment->link_delete = $this->app()->router()->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $Comment[ 'id' ] ] );
 				}
 				else {
-					if ( $comment[ 'member' ] != null ) {
-						$status = $this->_managers->getManagerOf( 'Members' )->getStatusMemberFromId( $comment[ 'member' ] );
-						if ( $status != self::MEMBER_STATUS_ADMIN
-							 && ( $this->getUser()->getLogin() == $comment[ 'auteur' ] || $this->getUser()->getLogin() == $news_author
-								  || $this->getUser()->getStatus() == 'admin' )
-						) {
-							$links[ $comment_author . '|' . $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) . '|' . $comment[ 'contenu' ] ][] = $this->app()->router()
-																																				  ->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $comment[ 'id' ] ] );
-							$links[ $comment_author . '|' . $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) . '|' . $comment[ 'contenu' ] ][] = $this->app()->router()
-																																				  ->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $comment[ 'id' ] ] );
-						}
+					$status = self::MEMBER_STATUS_MEMBER;
+					if ( $Comment[ 'fk_NMC' ] != null ) {
+						$status = $this->_managers->getManagerOf( 'Members' )->getStatusMemberFromId( $Comment[ 'fk_NMC' ] );
+					}
+					if ( $status != self::MEMBER_STATUS_ADMIN
+						 && ( $this->getUser()->getLogin() == $Comment[ 'auteur' ] || $this->getUser()->getLogin() == $news_author
+							  || $this->getUser()->getStatus() == 'admin' )
+					) {
+						$Comment->link_update = $this->app()->router()->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $Comment[ 'id' ] ] );
+						$Comment->link_delete = $this->app()->router()->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $Comment[ 'id' ] ] );
 					}
 				}
 			}
-			else {
-				$links[ $comment_author . '|' . $comment[ 'date' ]->format( 'd/m/Y à H\hi' ) . '|' . $comment[ 'contenu' ] ][] = null;
-			}
 		}
-		$this->_page->addVar( 'links', $links );
-		//var_dump($this->app()->router()->routes());
-		$this->_page->addVar('add_comment',$this->app()->router()->provideRoute('Frontend','News','insertComment',['id' => $news['id']]));
+		
+		$this->_page->addVar( 'news_author', $news_author );
+		$this->_page->addVar( 'title', $News->titre() );
+		//passage de la news
+		$this->_page->addVar( 'News', $News );
+		$this->_page->addVar('List_comments_a',$List_comments_a);
+		//passage du lien pour l'ajout d'un commentaire
+		$this->_page->addVar( 'add_comment', $this->app()->router()->provideRoute( 'Frontend', 'News', 'insertComment', [ 'id' => $News[ 'id' ] ] ) );
 	}
 	
 	/** insertion d'un commentaire
@@ -120,25 +115,25 @@ class NewsController extends BackController {
 		
 		if ( $request->method() == 'POST' ) {
 			if ( $request->postExists( 'auteur' ) ) {
-				$comment = new Comment( [
+				$Comment = new Comment( [
 					'news'    => $request->getData( 'news' ),
 					'auteur'  => $request->postData( 'auteur' ),
 					'contenu' => $request->postData( 'contenu' ),
 				] );
 			}
 			else {
-				$comment = new Comment( [
+				$Comment = new Comment( [
 					'news'    => $request->getData( 'news' ),
 					'contenu' => $request->postData( 'contenu' ),
 				] );
-				$comment->setMember( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
+				$Comment->setMember( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
 			}
 		}
 		else {
-			$comment = new Comment;
+			$Comment = new Comment;
 		}
 		
-		$formBuilder = new CommentFormBuilder( $comment );
+		$formBuilder = new CommentFormBuilder( $Comment );
 		$formBuilder->build( $this->_app->user(), $this->_managers->getManagerOf( 'Members' ) );
 		
 		$form = $formBuilder->form();
@@ -151,7 +146,7 @@ class NewsController extends BackController {
 		}
 		
 		$this->_page->addVar( 'title', 'Ajout d\'un commentaire' );
-		$this->_page->addVar( 'comment', $comment );
+		$this->_page->addVar( 'Comment', $Comment );
 		$this->_page->addVar( 'form', $form->createView() );
 	}
 }

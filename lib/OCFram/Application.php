@@ -16,13 +16,14 @@ abstract class Application {
 		$this->_name         = '';
 		$this->_user         = new User( $this );
 		$this->_config       = new Config( $this );
+		$this->_router 		 = null;
 	}
 	
 	public function getController() {
-		$this->_router = new Router( $this );
+		
 		try {
 			// On récupère la route correspondante à l'URL.
-			$matchedRoute = $this->_router->getRoute( $this->_httpRequest->requestURI(),$this->_name );
+			$matchedRoute = $this->router()->getRoute( $this->_httpRequest->requestURI(),$this->_name );
 		}
 		catch ( \RuntimeException $e ) {
 			// Si aucune route ne correspond, c'est que la page demandée n'existe pas.
@@ -62,6 +63,8 @@ abstract class Application {
 	}
 	
 	public function router(){
+		if ( null === $this->_router )
+			$this->_router = new Router( $this );
 		return $this->_router;
 	}
 }

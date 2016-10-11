@@ -84,6 +84,9 @@ class User extends ApplicationComponent {
 		if ( isset( $_SESSION[ 'auth' ] ) ) {
 			unset( $_SESSION[ 'auth' ] );
 		}
+		if ( isset( $_SESSION[ 'id' ] ) ) {
+			unset( $_SESSION[ 'id' ] );
+		}
 	}
 	
 	/** set le statut de l'utilisateur (membre/admin) */
@@ -95,6 +98,18 @@ class User extends ApplicationComponent {
 	public function getStatus() {
 		if ( isset( $_SESSION[ 'status' ] ) ) {
 			return $_SESSION[ 'status' ];
+		}
+		
+		return null;
+	}
+	
+	public function setId( $id ) {
+		$_SESSION[ 'id' ] = $id;
+	}
+	
+	public function getId() {
+		if ( isset( $_SESSION[ 'id' ] ) ) {
+			return $_SESSION[ 'id' ];
 		}
 		
 		return null;

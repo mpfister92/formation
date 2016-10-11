@@ -30,7 +30,8 @@ class ConnexionController extends BackController {
 			if ( $Member ) {
 				$this->_app->user()->setAuthenticated( true );
 				$this->_app->user()->setLogin( $login );
-				if ( $Member->user_type() == self::USER_TYPE_ADMIN ) {
+				$this->app()->user()->setId($Member->id());
+				if ( $Member->fk_NMY() == self::USER_TYPE_ADMIN ) {
 					$this->_app->user()->setStatus( 'admin' );
 				}
 				else {

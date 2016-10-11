@@ -1,8 +1,13 @@
-<?php if ( !empty( $links ) ): ?>
-	<?php foreach ( $links as $titre_and_contenu => $link ): ?>
-		<?php $string_array = explode('|',$titre_and_contenu) ?>
-		<h2><a href="<?= $link ?>"><?= $string_array[0] ?></a></h2>
-		<p><?= nl2br( $string_array[1] ) ?></p>
+<?php
+/**
+ * @var \Entity\News[] $List_news_a
+ */
+?>
+
+<?php if ( !empty( $List_news_a ) ): ?>
+	<?php foreach ( $List_news_a as $News ): ?>
+		<h2><a href="<?= $News['link'] ?>"><?= $News['titre'] ?></a></h2>
+		<p><?= nl2br( $News['contenu'] ) ?></p>
 	<?php endforeach; ?>
 
 <?php else: ?>

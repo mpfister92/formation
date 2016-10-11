@@ -27,24 +27,26 @@ class NewsController extends BackController {
 		$manager = $this->_managers->getManagerOf( 'News' );
 		
 		if ( $this->_app->user()->getStatus() == 'admin' ) {
-			$list_news   = $manager->getList();
+			$List_news_a = $manager->getList();
 			$number_news = $manager->countNews();
 		}
 		else {
-			$list_news   = $manager->getList( -1, -1, $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
-			$number_news = $manager->countNews( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
+			$id = $this->getUser()->getId();
+			$List_news_a = $manager->getList( -1, -1, $id );
+			$number_news = $manager->countNews( $id );
 		}
 		
-		$this->_page->addVar( 'listeNwes', $list_news );
-		$this->_page->addVar( 'nombreNews', $number_news );
-		
-		$links = [];
-		foreach ( $list_news as $news ) {
-			$links[ $news[ 'auteur' ] . '|' . $news[ 'titre' ] . '|' . $news[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) . '|' . $news[ 'dateModif' ]->format( 'd/m/Y à H\hi' ) ] = $this->app()
-																																													  ->router()
-																																													  ->provideRoute( 'Backend', 'News', 'update', [ 'id' => $news[ 'id' ] ] );
+		foreach ( $List_news_a as $News ) {
+			$News->link_edition      = $this->app()->router()->provideRoute( 'Backend', 'News', 'update', [ 'id' => $News[ 'id' ] ] );
+			$News->link_delete       = $this->app()->router()->provideRoute( 'Backend', 'News', 'delete', [ 'id' => $News[ 'id' ] ] );
+			$News->dateAjoutFormated = $News->dateAjout()->format( 'd/m/Y à H\hi' );
+			$News->dateModifFormated = $News->dateModif()->format( 'd/m/Y à H\hi' );
+			$News->setMember($this->_managers->getManagerOf('Members')->getMemberFromId($News->fk_NMC()));
 		}
 		
+		$this->_page->addVar( 'List_news_a', $List_news_a );
+		$this->_page->addVar( 'number_news', $number_news );
+		$this->_page->addVar( 'add_news', $this->app()->router()->provideRoute( 'Backend', 'News', 'insert', [] ) );
 	}
 	
 	/** insertion d'une news

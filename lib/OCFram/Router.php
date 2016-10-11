@@ -10,16 +10,23 @@ class Router extends ApplicationComponent {
 		$this->chargeRoute( $app->name() );
 	}
 	
+	/** ajoute une route avec la clé unique module/action dans le tableau des routes pour l'application passée
+	 * en paramètre
+	 * @param Route $Route
+	 * @param string $app_name
+	 *
+	 * @throws \Exception
+	 */
 	public function addRoute( Route $Route, $app_name ) {
-		if ( array_key_exists( $Route->module().'/'.$Route->action(), $this->_routes[ $app_name ] ) ) {
-			throw new \Exception('Erreur valeur déjà présente dans le tableau');
+		if ( array_key_exists( $Route->module() . '/' . $Route->action(), $this->_routes[ $app_name ] ) ) {
+			throw new \Exception( 'Erreur valeur déjà présente dans le tableau' );
 		}
-		$this->_routes[ $app_name ][$Route->module().'/'.$Route->action()] = $Route;
+		$this->_routes[ $app_name ][ $Route->module() . '/' . $Route->action() ] = $Route;
 	}
 	
-	public function getRoute( $url,$app_name) {
+	public function getRoute( $url, $app_name ) {
 		//parcours de l'ensemble des routes du router
-		foreach ( $this->_routes[$app_name] as $route ) {
+		foreach ( $this->_routes[ $app_name ] as $route ) {
 			//si on a une correspondance
 			if ( $route->match( $url ) ) {
 				//on récupère dans $varsValue le retour de la fonction preg_match (le tableau $matches -> la chaine capturée)
@@ -57,12 +64,12 @@ class Router extends ApplicationComponent {
 	 * @throws \Exception
 	 */
 	public function provideRoute( $app_name, $module, $action, array $vars ) {
-		$this->chargeRoute($app_name);
+		$this->chargeRoute( $app_name );
 		
-		if(!array_key_exists($module.'/'.$action,$this->_routes[$app_name])){
-			throw new \Exception('Le couple module/action n\'existe pas dans les routes');
+		if ( !array_key_exists( $module . '/' . $action, $this->_routes[ $app_name ] ) ) {
+			throw new \Exception( 'Le couple module/action n\'existe pas dans les routes' );
 		}
-		$url = $this->_routes[$app_name][$module.'/'.$action]->rewrite();
+		$url = $this->_routes[ $app_name ][ $module . '/' . $action ]->rewrite();
 		
 		if ( null !== $vars ) {
 			foreach ( $vars as $key => $value ) {
@@ -77,10 +84,13 @@ class Router extends ApplicationComponent {
 		return $url;
 	}
 	
+	/** insere dans la variable routes les routes correspondant à l'application
+	 * @param $app_name
+	 */
 	public function chargeRoute( $app_name ) {
 		if ( !array_key_exists( $app_name, $this->_routes ) ) {
 			
-			$this->_routes[$app_name] = [];
+			$this->_routes[ $app_name ] = [];
 			
 			$xml = new \DOMDocument();
 			$xml->load( __DIR__ . '/../../App/' . $app_name . '/Config/routes.xml' );
@@ -96,12 +106,12 @@ class Router extends ApplicationComponent {
 				}
 				
 				// On ajoute la route au routeur.
-				$this->addRoute( new Route( $route->getAttribute( 'url' ), $route->getAttribute( 'rewrite' ), $route->getAttribute( 'module' ), $route->getAttribute( 'action' ), $vars ),$app_name );
+				$this->addRoute( new Route( $route->getAttribute( 'url' ), $route->getAttribute( 'rewrite' ), $route->getAttribute( 'module' ), $route->getAttribute( 'action' ), $vars ), $app_name );
 			}
 		}
 	}
 	
-	public function routes(){
+	public function routes() {
 		return $this->_routes;
 	}
 }

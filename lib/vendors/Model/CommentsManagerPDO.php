@@ -51,7 +51,7 @@ class CommentsManagerPDO extends CommentsManager {
 	 * @return Comment[]
 	 */
 	public function getListOf( $news ) {
-		$sql = 'SELECT NCC_fk_NNC AS news,NCC_auteur AS auteur,NCC_contenu AS contenu,NCC_date AS date,NCC_id AS id, NCC_fk_NCE AS state, NCC_fk_NMC AS member 
+		$sql = 'SELECT NCC_id AS id,NCC_fk_NNC AS news,NCC_auteur AS auteur,NCC_contenu AS contenu,NCC_date AS date,NCC_id AS id, NCC_fk_NCE AS fk_NCE, NCC_fk_NMC AS fk_NMC 
                 FROM t_new_commentc
                 WHERE NCC_fk_NNC = :news
                 AND NCC_fk_NCE = :state';

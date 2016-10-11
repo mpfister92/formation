@@ -31,20 +31,24 @@ abstract class Entity implements \ArrayAccess {
 	
 	public function offsetExists( $var ) {
 		return isset( $this->$var )
-			   && is_callable( [
+			   /*&& is_callable( [
 			$this,
 			$var,
-		] );
+		] )*/;
 	}
 	
 	public function offsetGet( $var ) {
-		if ( isset( $this->$var )
-			 && is_callable( [
+		if ( isset( $this->$var ) ) {
+			if (is_callable( [
 				$this,
 				$var,
 			] )
-		) {
-			return $this->$var();
+			) {
+				return $this->$var();
+			}
+			else {
+				return $this->$var;
+			}
 		}
 	}
 	
