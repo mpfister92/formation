@@ -5,4 +5,5 @@
 	<route url="/commenter-([0-9]+)\.html" rewrite="/commenter-(id).html" module="News" action="insertComment" vars="news"></route>
 	<route url="/device\.html" rewrite="/device.html" module="Device" action="index"></route>
 	<route url="/inscription\.html" rewrite="/inscription.html" module="Connexion" action="inscription"></route>
+	<route url="/test\.json" rewrite="/test.json" format="json" module="News" action="insertCommentAjax"></route>
 </routes>

@@ -6,6 +6,12 @@ namespace OCFram;
 class Page extends ApplicationComponent {
 	protected $_contentFile;
 	protected $_vars = [];
+	protected $_format;
+	
+	public function __construct( Application $app, $format ) {
+		parent::__construct( $app );
+		$this->_format = $format;
+	}
 	
 	public function addVar( $var, $value ) {
 		if ( !is_string( $var ) || is_numeric( $var ) || empty( $var ) ) {
@@ -15,6 +21,7 @@ class Page extends ApplicationComponent {
 	}
 	
 	public function getGeneratedPage() {
+		var_dump($this->_contentFile);
 		if ( !file_exists( $this->_contentFile ) ) {
 			throw new \RuntimeException( 'Erreur : la vue n\'existe pas' );
 		}
@@ -23,6 +30,10 @@ class Page extends ApplicationComponent {
 		
 		//créé des variables à partir d'un tableau associatif
 		extract( $this->_vars );
+		
+		if($this->_format == 'json'){
+			json_encode($this->_vars);
+		}
 		
 		//enclanche la temporisation de sortie
 		ob_start();

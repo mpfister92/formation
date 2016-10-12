@@ -116,7 +116,7 @@ class MembersManagerPDO extends MembersManager {
 		$requete->bindValue( ':login', $member->login() );
 		$requete->bindValue( ':password', $member->password() );
 		$requete->bindValue( ':email', $member->email() );
-		$requete->bindValue( ':type', $member->user_type() );
+		$requete->bindValue( ':type', $member->fk_NMY() );
 		
 		
 		$requete->execute();

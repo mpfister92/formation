@@ -15,17 +15,17 @@ class ConnexionController extends BackController {
 	
 	use AppController;
 	
-	public function executeInscription( HTTPRequest $request ) {
+	public function executeInscription( HTTPRequest $Request ) {
 		
 		$this->run();
 		
-		if ( $request->method() == 'POST' ) {
+		if ( $Request->method() == 'POST' ) {
 			$member = new Member( [
-				'login'                 => $request->postData( 'login' ),
-				'password'              => $request->postData( 'password' ),
-				'email'                 => $request->postData( 'email' ),
-				'password_confirmation' => $request->postData( 'password_confirmation' ),
-				'email_confirmation'    => $request->postData( 'email_confirmation' ),
+				'login'                 => $Request->postData( 'login' ),
+				'password'              => $Request->postData( 'password' ),
+				'email'                 => $Request->postData( 'email' ),
+				'password_confirmation' => $Request->postData( 'password_confirmation' ),
+				'email_confirmation'    => $Request->postData( 'email_confirmation' ),
 			] );
 			$member->setUser_Type(self::USER_TYPE_MEMBER);
 		}
@@ -38,7 +38,7 @@ class ConnexionController extends BackController {
 		
 		$form = $formBuilder->form();
 		
-		$formHandler = new FormHandler( $form, $this->_managers->getManagerOf( 'Members' ), $request );
+		$formHandler = new FormHandler( $form, $this->_managers->getManagerOf( 'Members' ), $Request );
 		
 		if ( $formHandler->process() ) {
 			$this->_app->user()->setFlash( 'Vous êtes inscrit !' );

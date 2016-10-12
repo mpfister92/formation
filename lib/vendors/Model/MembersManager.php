@@ -12,6 +12,9 @@ use \OCFram\Manager;
 use \Entity\Member;
 
 abstract class MembersManager extends Manager {
+	const MEMBERY_ADMIN = 1;
+	const MEMBERY_MEMBER = 2;
+	
 	/** retourne vrai s'il existe un membre qui a le login passé en paramètre
 	 * @param string $login
 	 *

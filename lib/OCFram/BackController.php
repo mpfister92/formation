@@ -8,9 +8,9 @@ abstract class BackController extends ApplicationComponent {
 	protected $_view     = '';
 	protected $_managers = null;
 	
-	public function __construct( $app, $module, $action ) {
+	public function __construct( $app, $module, $action, $format ) {
 		parent::__construct( $app );
-		$this->_page = new Page( $app );
+		$this->_page = new Page( $app, $format );
 		$this->setAction( $action );
 		$this->setModule( $module );
 		$this->setView( $action );

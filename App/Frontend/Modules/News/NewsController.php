@@ -19,9 +19,9 @@ class NewsController extends BackController {
 	
 	/** affichage des news sur la page d'accueil
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function executeIndex( HTTPRequest $request ) {
+	public function executeIndex( HTTPRequest $Request ) {
 		$this->run();
 		
 		$number_news       = $this->_app->config()->get( 'nombre_news' );
@@ -48,14 +48,14 @@ class NewsController extends BackController {
 	
 	/** affichage d'une news est ses commentaires
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function executeShow( HTTPRequest $request ) {
+	public function executeShow( HTTPRequest $Request ) {
 		$this->run();
 		
 		$Manager = $this->_managers->getManagerOf( 'News' );
 		
-		$News = $Manager->getNews( $request->getData( 'id' ) );
+		$News = $Manager->getNews( $Request->getData( 'id' ) );
 		
 		if ( empty( $News ) ) {
 			$this->_app->httpResponse()->redirect404();
@@ -66,7 +66,7 @@ class NewsController extends BackController {
 		
 		//nom de l'auteur de la news
 		$news_author = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $News->id() );
-				
+		//affichage de la liste des commentaires
 		foreach ( $List_comments_a as $Comment ) {
 			//recuperation du login de l'auteur du commentaire
 			if ( $Comment[ 'fk_NMC' ] != null ) {
@@ -77,7 +77,7 @@ class NewsController extends BackController {
 			}
 			$Comment->date_formated = $Comment->date()->format( 'd/m/Y à H\hi' );
 			if ( $this->getUser()->isAuthenticated() ) {
-				if ( $this->getUser()->getStatus() == 'admin' ) {
+				if ( $this->loggedUserIsAdmin() ) {
 					$Comment->link_update = $this->app()->router()->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $Comment[ 'id' ] ] );
 					$Comment->link_delete = $this->app()->router()->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $Comment[ 'id' ] ] );
 				}
@@ -88,7 +88,7 @@ class NewsController extends BackController {
 					}
 					if ( $status != self::MEMBER_STATUS_ADMIN
 						 && ( $this->getUser()->getLogin() == $Comment[ 'auteur' ] || $this->getUser()->getLogin() == $news_author
-							  || $this->getUser()->getStatus() == 'admin' )
+							  || $this->loggedUserIsAdmin() )
 					) {
 						$Comment->link_update = $this->app()->router()->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $Comment[ 'id' ] ] );
 						$Comment->link_delete = $this->app()->router()->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $Comment[ 'id' ] ] );
@@ -97,56 +97,88 @@ class NewsController extends BackController {
 			}
 		}
 		
+		$formBuilder = new CommentFormBuilder( new Comment() );
+		$formBuilder->build( $this->_app->user(), $this->_managers->getManagerOf( 'Members' ) );
+		
+		$this->_page->addVar( 'add_comment_form', $formBuilder->form()->createView() );
+		
 		$this->_page->addVar( 'news_author', $news_author );
 		$this->_page->addVar( 'title', $News->titre() );
 		//passage de la news
 		$this->_page->addVar( 'News', $News );
-		$this->_page->addVar('List_comments_a',$List_comments_a);
+		$this->_page->addVar( 'List_comments_a', $List_comments_a );
 		//passage du lien pour l'ajout d'un commentaire
 		$this->_page->addVar( 'add_comment', $this->app()->router()->provideRoute( 'Frontend', 'News', 'insertComment', [ 'id' => $News[ 'id' ] ] ) );
 	}
 	
-	/** insertion d'un commentaire
-	 *
-	 * @param HTTPRequest $request
-	 */
-	public function executeInsertComment( HTTPRequest $request ) {
-		$this->run();
-		
-		if ( $request->method() == 'POST' ) {
-			if ( $request->postExists( 'auteur' ) ) {
+	private function formTreatment( HTTPRequest $Request ) {
+		if ( $Request->method() == 'POST' ) {
+			if ( $Request->postExists( 'auteur' ) ) {
 				$Comment = new Comment( [
-					'news'    => $request->getData( 'news' ),
-					'auteur'  => $request->postData( 'auteur' ),
-					'contenu' => $request->postData( 'contenu' ),
+					'fk_NNC'  => $Request->getData( 'news' ),
+					'auteur'  => $Request->postData( 'auteur' ),
+					'contenu' => $Request->postData( 'contenu' ),
 				] );
 			}
 			else {
 				$Comment = new Comment( [
-					'news'    => $request->getData( 'news' ),
-					'contenu' => $request->postData( 'contenu' ),
+					'fk_NNC'  => $Request->getData( 'news' ),
+					'contenu' => $Request->postData( 'contenu' ),
 				] );
-				$Comment->setMember( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
+				$Comment->setFk_NMC( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
 			}
 		}
 		else {
 			$Comment = new Comment;
 		}
 		
+		return $Comment;
+	}
+	
+	/** insertion d'un commentaire
+	 *
+	 * @param HTTPRequest $Request
+	 */
+	public function executeInsertComment( HTTPRequest $Request ) {
+		$this->run();
+		
+		$Comment = $this->formTreatment( $Request );
+		
 		$formBuilder = new CommentFormBuilder( $Comment );
 		$formBuilder->build( $this->_app->user(), $this->_managers->getManagerOf( 'Members' ) );
 		
 		$form = $formBuilder->form();
 		
-		$formHandler = new FormHandler( $form, $this->_managers->getManagerOf( 'Comments' ), $request );
+		$formHandler = new FormHandler( $form, $this->_managers->getManagerOf( 'Comments' ), $Request );
 		
 		if ( $formHandler->process() ) {
 			$this->_app->user()->setFlash( 'Le commentaire a bien été ajouté, merci !' );
-			$this->_app->httpResponse()->redirect( 'news-' . $request->getData( 'news' ) . '.html' );
+			$this->_app->httpResponse()->redirect( 'news-' . $Request->getData( 'news' ) . '.html' );
 		}
 		
 		$this->_page->addVar( 'title', 'Ajout d\'un commentaire' );
 		$this->_page->addVar( 'Comment', $Comment );
 		$this->_page->addVar( 'form', $form->createView() );
+	}
+	
+	public function executeInsertCommentAjax( HTTPRequest $Request ) {
+		$this->run();
+		
+		$Comment = $this->formTreatment( $Request );
+		
+		$this->_page->addVar( 'success', false );
+		if ( !$Comment->isValid() ) {
+			$this->_page->addVar( 'error_message', 'Veuillez remplir tous les champs' );
+		}
+		else {
+			if ( $this->_managers->getManagerOf( 'Members' )->existsMemberUsingLogin( $Comment->auteur() ) ) {
+				$this->_page->addVar( 'error_message', 'Vous ne pouvez pas utiliser ce nom pour votre commentaire' );
+			}
+			else {
+				$this->_page->addVar( 'success', true );
+				$this->_page->addVar( 'Comment', $Comment );
+			}
+		}
+		
 	}
 }

@@ -109,7 +109,7 @@ class NewsManagerPDO extends NewsManager {
 	 *
 	 * @param News $news
 	 */
-	protected function add( News $news ) {
+	protected function add( News $News ) {
 		$sql = 'INSERT INTO t_new_newsc SET 
 					NNC_fk_NMC = :id,
 					NNC_titre = :titre,
@@ -119,9 +119,9 @@ class NewsManagerPDO extends NewsManager {
 					NNC_fk_NNE = :state';
 		
 		$request = $this->_dao->prepare( $sql );
-		$request->bindValue( ':id', $news->auteur() );
-		$request->bindValue( ':titre', $news->titre() );
-		$request->bindValue( ':contenu', $news->contenu() );
+		$request->bindValue( ':id', $News->fk_NMC() );
+		$request->bindValue( ':titre', $News->titre() );
+		$request->bindValue( ':contenu', $News->contenu() );
 		$request->bindValue( ':state', parent::NEWS_STATE_VALID );
 		
 		$request->execute();
@@ -131,7 +131,7 @@ class NewsManagerPDO extends NewsManager {
 	 *
 	 * @param News $news
 	 */
-	protected function modify( News $news ) {
+	protected function modify( News $News ) {
 		$sql = 'UPDATE t_new_newsc SET 
 					NNC_fk_NMC = :auteur,
 					NNC_titre = :titre,
@@ -140,10 +140,10 @@ class NewsManagerPDO extends NewsManager {
 					WHERE NNC_id = :id';
 		
 		$request = $this->_dao->prepare( $sql );
-		$request->bindValue( ':auteur', $news->auteur() );
-		$request->bindValue( ':titre', $news->titre() );
-		$request->bindValue( ':contenu', $news->contenu() );
-		$request->bindValue( ':id', $news->id(), \PDO::PARAM_INT );
+		$request->bindValue( ':auteur', $News->fk_NMC() );
+		$request->bindValue( ':titre', $News->titre() );
+		$request->bindValue( ':contenu', $News->contenu() );
+		$request->bindValue( ':id', $News->id(), \PDO::PARAM_INT );
 		
 		$request->execute();
 	}

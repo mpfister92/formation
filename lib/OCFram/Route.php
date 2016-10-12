@@ -6,15 +6,17 @@ class Route {
 	protected $_module;
 	protected $_url;
 	protected $_rewrite;
+	protected $_format;
 	protected $_varsNames = [];
 	protected $_vars      = [];
 	
-	public function __construct( $url, $rewrite, $module, $action, $varsName ) {
+	public function __construct( $url, $rewrite, $module, $action, $varsName, $format=null ) {
 		$this->setUrl( $url );
 		$this->setModule( $module );
 		$this->setAction( $action );
 		$this->setVarsName( $varsName );
 		$this->setRewrite($rewrite);
+		$this->setFormat($format);
 	}
 	
 	public function hasVars() {
@@ -32,6 +34,12 @@ class Route {
 	public function setAction( $action ) {
 		if ( is_string( $action ) ) {
 			$this->_action = $action;
+		}
+	}
+	
+	public function setFormat($format){
+		if(is_string($format)){
+			$this->_format = $format;
 		}
 	}
 	
@@ -83,6 +91,10 @@ class Route {
 	
 	public function vars() {
 		return $this->_vars;
+	}
+	
+	public function format(){
+		return $this->_format;
 	}
 }
 

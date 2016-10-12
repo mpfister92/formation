@@ -106,7 +106,7 @@ class Router extends ApplicationComponent {
 				}
 				
 				// On ajoute la route au routeur.
-				$this->addRoute( new Route( $route->getAttribute( 'url' ), $route->getAttribute( 'rewrite' ), $route->getAttribute( 'module' ), $route->getAttribute( 'action' ), $vars ), $app_name );
+				$this->addRoute( new Route( $route->getAttribute( 'url' ), $route->getAttribute( 'rewrite' ), $route->getAttribute( 'module' ), $route->getAttribute( 'action' ), $vars, $route->getAttribute('format') ?: 'html' ), $app_name );
 			}
 		}
 	}

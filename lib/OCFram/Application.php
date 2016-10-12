@@ -37,7 +37,7 @@ abstract class Application {
 		// On instancie le contrôleur.
 		$controllerClass = 'App\\' . $this->_name . '\\Modules\\' . $matchedRoute->module() . '\\' . $matchedRoute->module() . 'Controller';
 		
-		return new $controllerClass( $this, $matchedRoute->module(), $matchedRoute->action() );
+		return new $controllerClass( $this, $matchedRoute->module(), $matchedRoute->action(), $matchedRoute->format() );
 	}
 	
 	abstract public function run();

@@ -15,9 +15,6 @@
 <?php } ?>
 
 
-<p><a href="<?= $add_comment ?>">Ajouter un commentaire</a></p>
-
-
 <?php if ( empty( $List_comments_a ) ): ?>
 	<p>Aucun commentaire n'a encore été posté. Soyez le premier à en laisser un !</p>
 <?php endif; ?>
@@ -27,14 +24,27 @@
 		<legend>
 			Posté par
 			<strong>
-				<?= $Comment['comment_author'] ?>
+				<?= $Comment[ 'comment_author' ] ?>
 			</strong>
-			le <?= $Comment['date_formated'] ?>
-			<a href="<?= $Comment['link_update'] ?>">Modifier</a> -
-			<a href="<?= $Comment['link_delete'] ?>">Supprimer</a> -
+			le <?= $Comment[ 'date_formated' ] ?>
+			<?php if ( isset( $Comment[ 'link_update' ] ) && ( isset( $Comment[ 'link_delete' ] ) ) ): ?>
+				<a href="<?= $Comment[ 'link_update' ] ?>">Modifier</a> -
+				<a href="<?= $Comment[ 'link_delete' ] ?>">Supprimer</a>
+			<?php endif; ?>
 		</legend>
-		<p><?= nl2br( htmlspecialchars( $Comment['contenu'] ) ) ?></p>
+		<p><?= nl2br( htmlspecialchars( $Comment[ 'contenu' ] ) ) ?></p>
 	</fieldset>
 <?php endforeach; ?>
 
-<p><a href="<?= $add_comment ?>">Ajouter un commentaire</a></p>
+<h3>Postez votre commentaire</h3>
+<form id="form" action="" class="js-from-comment-news">
+	
+	<div class="js-error"></div>
+	<p>
+		<?= $add_comment_form ?>
+		
+		<input type="submit" id="envoi" value="Commenter" />
+	</p>
+</form>
+
+

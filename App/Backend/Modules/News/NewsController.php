@@ -17,9 +17,9 @@ class NewsController extends BackController {
 	
 	/** affichage des news pour le backend
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function executeIndex( HTTPRequest $request ) {
+	public function executeIndex( HTTPRequest $Request ) {
 		$this->run();
 		
 		$this->_page->addVar( 'title', 'Gestion des news' );
@@ -51,59 +51,59 @@ class NewsController extends BackController {
 	
 	/** insertion d'une news
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function executeInsert( HTTPRequest $request ) {
+	public function executeInsert( HTTPRequest $Request ) {
 		$this->run();
 		
-		$this->processForm( $request );
+		$this->processForm( $Request );
 		
 		$this->_page->addVar( 'title', 'Ajout d\'une news' );
 	}
 	
 	/** gestion du formulaire pour l'insertion et l'update
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function processForm( HTTPRequest $request ) {
-		if ( $request->method() == 'POST' ) {
-			if ( $request->postExists( 'auteur' ) ) {
-				$news = new News( [
-					'auteur'  => $request->postData( 'auteur' ),
-					'titre'   => $request->postData( 'titre' ),
-					'contenu' => $request->postData( 'contenu' ),
+	public function processForm( HTTPRequest $Request ) {
+		if ( $Request->method() == 'POST' ) {
+			if ( $Request->postExists( 'auteur' ) ) {
+				$News = new News( [
+					'auteur'  => $Request->postData( 'auteur' ),
+					'titre'   => $Request->postData( 'titre' ),
+					'contenu' => $Request->postData( 'contenu' ),
 				] );
 			}
 			else {
-				$news = new News( [
-					'titre'   => $request->postData( 'titre' ),
-					'contenu' => $request->postData( 'contenu' ),
+				$News = new News( [
+					'titre'   => $Request->postData( 'titre' ),
+					'contenu' => $Request->postData( 'contenu' ),
 				] );
-				$news->setAuteur( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
+				$News->setFk_NMC( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
 			}
 			
-			if ( $request->getExists( 'id' ) ) {
-				$news->setId( $request->getData( 'id' ) );
+			if ( $Request->getExists( 'id' ) ) {
+				$News->setId( $Request->getData( 'id' ) );
 			}
 		}
 		else {
-			if ( $request->getExists( 'id' ) ) {
-				$news = $this->_managers->getManagerOf( 'News' )->getNews( $request->getData( 'id' ) );
+			if ( $Request->getExists( 'id' ) ) {
+				$News = $this->_managers->getManagerOf( 'News' )->getNews( $Request->getData( 'id' ) );
 			}
 			else {
-				$news = new News;
+				$News = new News;
 			}
 		}
 		
-		$formBuilder = new NewsFormBuilder( $news );
+		$formBuilder = new NewsFormBuilder( $News );
 		$formBuilder->build( $this->_app->user() );
 		
 		$form = $formBuilder->form();
 		
-		$formHandler = new FormHandler( $form, $this->_managers->getManagerOf( 'News' ), $request );
+		$formHandler = new FormHandler( $form, $this->_managers->getManagerOf( 'News' ), $Request );
 		
 		if ( $formHandler->process() ) {
-			$this->_app->user()->setFlash( $news->isNew() ? 'La news a bien été ajoutée !' : 'La news a bien été modifiée !' );
+			$this->_app->user()->setFlash( $News->isNew() ? 'La news a bien été ajoutée !' : 'La news a bien été modifiée !' );
 			$this->_app->httpResponse()->redirect( '/' );
 		}
 		$this->_page->addVar( 'form', $form->createView() );
@@ -111,37 +111,34 @@ class NewsController extends BackController {
 	
 	/** update d'une news
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function executeUpdate( HTTPRequest $request ) {
+	public function executeUpdate( HTTPRequest $Request ) {
 		$this->run();
 		
-		$id    = $request->getData( 'id' );
+		$id    = $Request->getData( 'id' );
 		$login = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $id );
 		if ( $login !== $this->_app->user()->getLogin() && $this->_app->user()->getStatus() !== 'admin' ) {
 			$this->_app->httpResponse()->redirect404();
 		}
 		else {
-			$this->processForm( $request );
-			$this->_page->addVar( 'title', 'Modification d\'une news' );
-			
-			$this->processForm( $request );
+			$this->processForm( $Request );
 		}
 	}
 	
 	/** suppression d'une news
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function executeDelete( HTTPRequest $request ) {
+	public function executeDelete( HTTPRequest $Request ) {
 		$this->run();
 		
-		if ( $request->getExists( 'id' ) ) {
-			$id    = $request->getData( 'id' );
+		if ( $Request->getExists( 'id' ) ) {
+			$id    = $Request->getData( 'id' );
 			$login = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $id );
 			if ( $login == $this->_app->user()->getLogin() || $this->_app->user()->getStatus() == 'admin' ) {
-				$this->_managers->getManagerOf( 'News' )->delete( $request->getData( 'id' ) );
-				$this->_managers->getManagerOf( 'Comments' )->deleteFromNews( $request->getData( 'id' ) );
+				$this->_managers->getManagerOf( 'News' )->delete( $Request->getData( 'id' ) );
+				$this->_managers->getManagerOf( 'Comments' )->deleteFromNews( $Request->getData( 'id' ) );
 				
 				$this->_app->user()->setFlash( 'La news a bien été supprimée !' );
 				
@@ -155,35 +152,35 @@ class NewsController extends BackController {
 	
 	/** update d'un commentaire
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function executeUpdateComment( HTTPRequest $request ) {
+	public function executeUpdateComment( HTTPRequest $Request ) {
 		$this->run();
 		
 		$this->_page->addVar( 'title', 'Modification d\'un commentaire' );
 		
-		if ( $request->method() == 'POST' ) {
-			if ( $request->postExists( 'auteur' ) ) {
+		if ( $Request->method() == 'POST' ) {
+			if ( $Request->postExists( 'auteur' ) ) {
 				$comment = new Comment( [
-					'id'      => $request->getData( 'id' ),
-					'auteur'  => $request->postData( 'auteur' ),
-					'contenu' => $request->postData( 'contenu' ),
+					'id'      => $Request->getData( 'id' ),
+					'auteur'  => $Request->postData( 'auteur' ),
+					'contenu' => $Request->postData( 'contenu' ),
 				] );
 			}
 			else {
 				$comment = new Comment ( [
-					'id'      => $request->getData( 'id' ),
-					'contenu' => $request->postData( 'contenu' ),
+					'id'      => $Request->getData( 'id' ),
+					'contenu' => $Request->postData( 'contenu' ),
 				] );
-				$comment->setAuteur( $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $request->getData( 'id' ) ) );
+				$comment->setAuteur( $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $Request->getData( 'id' ) ) );
 			}
 		}
 		else {
-			$comment = $this->_managers->getManagerOf( 'Comments' )->get( $request->getData( 'id' ) );
+			$comment = $this->_managers->getManagerOf( 'Comments' )->get( $Request->getData( 'id' ) );
 		}
 		
-		if ( $request->getExists( 'id' ) ) {
-			$id_comment     = $request->getData( 'id' );
+		if ( $Request->getExists( 'id' ) ) {
+			$id_comment     = $Request->getData( 'id' );
 			$news_author    = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
 			$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
 			if ( ( $comment_author != 'admin' && ( $comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin() )
@@ -194,7 +191,7 @@ class NewsController extends BackController {
 				
 				$form = $formBuilder->form();
 				
-				$formHandler = new FormHandler( $form, $this->_managers->getManagerOf( 'Comments' ), $request );
+				$formHandler = new FormHandler( $form, $this->_managers->getManagerOf( 'Comments' ), $Request );
 				
 				if ( $formHandler->process() ) {
 					$this->_app->user()->setFlash( 'Le commentaire a bien été modifié !' );
@@ -210,18 +207,18 @@ class NewsController extends BackController {
 	
 	/** suppression d'un commentaire
 	 *
-	 * @param HTTPRequest $request
+	 * @param HTTPRequest $Request
 	 */
-	public function executeDeleteComment( HTTPRequest $request ) {
+	public function executeDeleteComment( HTTPRequest $Request ) {
 		$this->run();
 		
-		$id_comment     = $request->getData( 'id' );
+		$id_comment     = $Request->getData( 'id' );
 		$news_author    = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
 		$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
 		if ( ( $comment_author != 'admin' && ( $comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin() )
 			   || ( $this->_app->user()->getStatus() == 'admin' ) )
 		) {
-			$this->_managers->getManagerOf( 'Comments' )->delete( $request->getData( 'id' ) );
+			$this->_managers->getManagerOf( 'Comments' )->delete( $Request->getData( 'id' ) );
 			$this->_app->user()->setFlash( 'Le commentaire a bien été supprimé !' );
 			$this->_app->httpResponse()->redirect( '.' );
 		}

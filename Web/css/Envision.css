@@ -217,6 +217,11 @@ input.button {
 	padding: 0; 
 	margin: 10px auto;
 }
+
+#erreur {
+	display : none;
+	}
+
 header {
 	width: 820px;
 	position: relative;

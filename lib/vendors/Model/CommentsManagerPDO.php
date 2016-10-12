@@ -14,9 +14,9 @@ use \Entity\Comment;
 class CommentsManagerPDO extends CommentsManager {
 	/** ajoute un commentaire dans la base
 	 *
-	 * @param Comment $comment
+	 * @param Comment $Comment
 	 */
-	protected function add( Comment $comment ) {
+	protected function add( Comment $Comment ) {
 		$sql = 'INSERT INTO t_new_commentc SET 
                   NCC_fk_NNC = :news,
                   NCC_auteur = :auteur,
@@ -26,22 +26,22 @@ class CommentsManagerPDO extends CommentsManager {
 		 		  NCC_fk_NMC = :member';
 		
 		$requete = $this->_dao->prepare( $sql );
-		$requete->bindValue( ':news', $comment->news(), \PDO::PARAM_INT );
-		if ( $comment->auteur() != null ) {
-			$requete->bindValue( ':auteur', $comment->auteur() );
+		$requete->bindValue( ':news', $Comment->fk_NNC(), \PDO::PARAM_INT );
+		if ( $Comment->auteur() != null ) {
+			$requete->bindValue( ':auteur', $Comment->auteur() );
 			$requete->bindValue( ':member', null );
 		}
-		if ( $comment->member() != null ) {
-			$requete->bindValue( ':member', $comment->member() );
+		if ( $Comment->fk_NMC() != null ) {
+			$requete->bindValue( ':member', $Comment->fk_NMC() );
 			$requete->bindValue( ':auteur', null );
 		}
-		$requete->bindValue( ':contenu', $comment->contenu() );
+		$requete->bindValue( ':contenu', $Comment->contenu() );
 		$requete->bindValue( ':state', self::COMMENT_STATE_VALID );
 		
 		
 		$requete->execute();
 		
-		$comment->setId( $this->_dao->lastInsertId() );
+		$Comment->setId( $this->_dao->lastInsertId() );
 	}
 	
 	/** retourne la liste des commentaires pour une news

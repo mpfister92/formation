@@ -52,8 +52,8 @@ trait AppController {
 	 *
 	 * @return bool
 	 */
-	public function loggetUserIsAdmin() {
-		return 'admin' == $this->app()->user()->getStatus();
+	public function loggedUserIsAdmin() {
+		return 1 == $this->app()->user()->getStatus();
 	}
 	
 	public function getUser() {
