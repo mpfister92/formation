@@ -42,3 +42,6 @@ This part consist to add a functionnality for ask a route for a Controller and a
 * Form to add new comment must work now with ajax. So when user submit his form, don't reload the page but post an ajax query to valid the form.
 * Show errors or add new comment directly if there are no error.
 * The HTTP Response of any ajax call must be a JSON Object.
+
+# 8 - Refresh page 
+* Add new js action in order to periodically refresh the news page and its comments so that there is no gap between 2 comment insertions   
