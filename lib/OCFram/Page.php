@@ -21,19 +21,23 @@ class Page extends ApplicationComponent {
 	}
 	
 	public function getGeneratedPage() {
-		var_dump($this->_contentFile);
 		if ( !file_exists( $this->_contentFile ) ) {
 			throw new \RuntimeException( 'Erreur : la vue n\'existe pas' );
 		}
 		
+		if ( $this->_format == 'json' ) {
+			return $this->getGeneratedPageJSON();
+		}
+		else {
+			return $this->getGeneratedPageHTML();
+		}
+	}
+	
+	public function getGeneratedPageHTML() {
 		$user = $this->_app->user();
 		
 		//créé des variables à partir d'un tableau associatif
 		extract( $this->_vars );
-		
-		if($this->_format == 'json'){
-			json_encode($this->_vars);
-		}
 		
 		//enclanche la temporisation de sortie
 		ob_start();
@@ -46,6 +50,20 @@ class Page extends ApplicationComponent {
 		require __DIR__ . '/../../App/' . $this->_app->name() . '/Templates/layout.php';
 		
 		return ob_get_clean();
+	}
+	
+	public function getGeneratedPageJSON() {
+		$user = $this->_app->user();
+		
+		//créé des variables à partir d'un tableau associatif
+		extract( $this->_vars );
+		
+		
+		$content = include($this->_contentFile);
+		
+		$final_content = include(__DIR__ . '/../../App/' . $this->_app->name() . '/Templates/layout.json.php');
+		
+		return json_encode($final_content);
 	}
 	
 	public function setContentFile( $contentFile ) {

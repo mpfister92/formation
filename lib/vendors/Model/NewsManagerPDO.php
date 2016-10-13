@@ -41,7 +41,6 @@ class NewsManagerPDO extends NewsManager {
 		
 		
 		foreach ( $listeNews as $news ) {
-			date_default_timezone_set( "Europe/Paris" );
 			$news->setDateAjout( new \DateTime( $news->dateAjout() ) );
 			$news->setDateModif( new \DateTime( $news->dateModif() ) );
 		}

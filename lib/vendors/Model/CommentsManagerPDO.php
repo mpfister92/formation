@@ -16,7 +16,7 @@ class CommentsManagerPDO extends CommentsManager {
 	 *
 	 * @param Comment $Comment
 	 */
-	protected function add( Comment $Comment ) {
+	public function add( Comment $Comment ) {
 		$sql = 'INSERT INTO t_new_commentc SET 
                   NCC_fk_NNC = :news,
                   NCC_auteur = :auteur,
@@ -41,6 +41,7 @@ class CommentsManagerPDO extends CommentsManager {
 		
 		$requete->execute();
 		
+		$Comment->setDate(new \DateTime());
 		$Comment->setId( $this->_dao->lastInsertId() );
 	}
 	
@@ -98,7 +99,7 @@ class CommentsManagerPDO extends CommentsManager {
 	 * @return Comment
 	 */
 	public function get( $id ) {
-		$sql = 'SELECT NCC_id AS id,NCC_fk_NNC AS news,NCC_auteur AS auteur,NCC_contenu AS contenu, NCC_fk_NMC AS member
+		$sql = 'SELECT NCC_id AS id,NCC_fk_NNC AS fk_NNC,NCC_auteur AS auteur,NCC_contenu AS contenu, NCC_fk_NMC AS fk_NMC
                 FROM t_new_commentc
                 WHERE NCC_id = :id';
 		
@@ -175,7 +176,23 @@ class CommentsManagerPDO extends CommentsManager {
 	 * @return string
 	 */
 	public function getCommentAuthorFromId( $id ) {
-		$sql = 'SELECT NCC_auteur
+		$sql = 'SELECT NCC_auteur 
+				FROM t_new_commentc
+				WHERE NCC_id = :id';
+		
+		$request = $this->_dao->prepare( $sql );
+		
+		$request->bindValue( ':id', $id, \PDO::PARAM_INT );
+		
+		$request->execute();
+		
+		$result = $request->fetchColumn();
+		
+		return $result;
+	}
+	
+	public function getCommentMemberIdFromId($id){
+		$sql = 'SELECT NCC_fk_NMC 
 				FROM t_new_commentc
 				WHERE NCC_id = :id';
 		

@@ -14,6 +14,16 @@
 	</p>
 <?php } ?>
 
+<h3>Postez votre commentaire</h3>
+<form id="form-top" action="insertComment.php" class="js-form-comment-news	" data-ajax-url="<?= $url_response_form ?>">
+	
+	<div class="js-error"></div>
+	<p>
+		<?= $add_comment_form ?>
+		
+		<input type="submit" id="send_form_top" value="Commenter" />
+	</p>
+</form>
 
 <?php if ( empty( $List_comments_a ) ): ?>
 	<p>Aucun commentaire n'a encore été posté. Soyez le premier à en laisser un !</p>
@@ -37,13 +47,13 @@
 <?php endforeach; ?>
 
 <h3>Postez votre commentaire</h3>
-<form id="form" action="" class="js-from-comment-news">
+<form id="form-bot" action="insertComment.php" class="js-form-comment-news" data-ajax-url="<?= $url_response_form ?>">
 	
 	<div class="js-error"></div>
 	<p>
 		<?= $add_comment_form ?>
 		
-		<input type="submit" id="envoi" value="Commenter" />
+		<input type="submit" id="send_form_bot" value="Commenter" />
 	</p>
 </form>
 

@@ -27,10 +27,10 @@ trait AppController {
 		$menu[ 'Accueil' ] = "/";
 		
 		if ( $user->isAuthenticated() ) {
-			if ( $user->getStatus() == 'admin' ) {
+			if ( $user->getStatus() == self::STATUS_MEMBER_ADMIN ) {
 				$menu[ 'Admin' ] = $this->app()->router()->provideRoute( 'Backend', 'News', 'index', [] );
 			}
-			if ( $user->getStatus() == 'member' ) {
+			if ( $user->getStatus() == self::STATUS_MEMBER_MEMBER ) {
 				$menu[ 'Vos news' ] = $this->app()->router()->provideRoute( 'Backend', 'News', 'index', [] );
 			}
 			$menu [ 'Ajouter une news' ] = $this->app()->router()->provideRoute( 'Backend', 'News', 'insert', [] );

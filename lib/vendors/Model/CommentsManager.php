@@ -19,7 +19,7 @@ abstract class CommentsManager extends Manager
 	/** ajoute un commentaire dans la base
 	 * @param Comment $comment
 	 */
-    abstract protected function add(Comment $comment);
+    abstract public function add(Comment $comment);
 	
 	/** retourne la liste des commentaires pour une news
 	 * @param $news

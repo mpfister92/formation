@@ -19,7 +19,7 @@ class HTTPResponse extends ApplicationComponent {
 	
 	public function redirect404() {
 		//création d'une instance de la classe page
-		$this->_page = new Page( $this->_app );
+		$this->_page = new Page( $this->_app, 'html' );
 		//$this->run();
 		//assignation du fichier qui fait office de vue à générer
 		$this->_page->setContentFile( __DIR__ . '/../../Errors/404.html' );

@@ -14,8 +14,6 @@ use \OCFram\FormHandler;
 
 class NewsController extends BackController {
 	use AppController;
-	const MEMBER_STATUS_ADMIN  = 1;
-	const MEMBER_STATUS_MEMBER = 2;
 	
 	/** affichage des news sur la page d'accueil
 	 *
@@ -75,6 +73,8 @@ class NewsController extends BackController {
 			else {
 				$Comment->comment_author = $Comment[ 'auteur' ];
 			}
+			
+			
 			$Comment->date_formated = $Comment->date()->format( 'd/m/Y à H\hi' );
 			if ( $this->getUser()->isAuthenticated() ) {
 				if ( $this->loggedUserIsAdmin() ) {
@@ -82,12 +82,12 @@ class NewsController extends BackController {
 					$Comment->link_delete = $this->app()->router()->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $Comment[ 'id' ] ] );
 				}
 				else {
-					$status = self::MEMBER_STATUS_MEMBER;
+					$status = self::STATUS_MEMBER_MEMBER;
 					if ( $Comment[ 'fk_NMC' ] != null ) {
 						$status = $this->_managers->getManagerOf( 'Members' )->getStatusMemberFromId( $Comment[ 'fk_NMC' ] );
 					}
-					if ( $status != self::MEMBER_STATUS_ADMIN
-						 && ( $this->getUser()->getLogin() == $Comment[ 'auteur' ] || $this->getUser()->getLogin() == $news_author
+					if ( $status != self::STATUS_MEMBER_ADMIN
+						 && ( $this->getUser()->getLogin() == $Comment->comment_author || $this->getUser()->getLogin() == $news_author
 							  || $this->loggedUserIsAdmin() )
 					) {
 						$Comment->link_update = $this->app()->router()->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $Comment[ 'id' ] ] );
@@ -109,6 +109,8 @@ class NewsController extends BackController {
 		$this->_page->addVar( 'List_comments_a', $List_comments_a );
 		//passage du lien pour l'ajout d'un commentaire
 		$this->_page->addVar( 'add_comment', $this->app()->router()->provideRoute( 'Frontend', 'News', 'insertComment', [ 'id' => $News[ 'id' ] ] ) );
+		
+		$this->_page->addVar( 'url_response_form', $this->app()->router()->provideRoute( 'Frontend', 'News', 'insertCommentAjax', [ 'news' => $News[ 'id' ] ] ) );
 	}
 	
 	private function formTreatment( HTTPRequest $Request ) {
@@ -131,6 +133,8 @@ class NewsController extends BackController {
 		else {
 			$Comment = new Comment;
 		}
+		
+		//var_dump($Comment);
 		
 		return $Comment;
 	}
@@ -168,17 +172,60 @@ class NewsController extends BackController {
 		
 		$this->_page->addVar( 'success', false );
 		if ( !$Comment->isValid() ) {
-			$this->_page->addVar( 'error_message', 'Veuillez remplir tous les champs' );
+			if ( !$Comment->contenu() && !$Comment->auteur() && !$this->getUser()->isAuthenticated() ) {
+				$this->_page->addVar( 'error_message', 'Veuillez ajouter un auteur et un contenu' );
+				$this->_page->addVar( 'error_code', 1 );
+			}
+			else {
+				if ( !$Comment->contenu() ) {
+					$this->_page->addVar( 'error_message', 'Veuillez ajouter un contenu' );
+					$this->_page->addVar( 'error_code', 2 );
+				}
+				else {
+					$this->_page->addVar( 'error_message', 'Veuillez ajouter auteur' );
+					$this->_page->addVar( 'error_code', 3 );
+				}
+			}
 		}
 		else {
 			if ( $this->_managers->getManagerOf( 'Members' )->existsMemberUsingLogin( $Comment->auteur() ) ) {
 				$this->_page->addVar( 'error_message', 'Vous ne pouvez pas utiliser ce nom pour votre commentaire' );
+				$this->_page->addVar( 'error_code', 4 );
 			}
 			else {
 				$this->_page->addVar( 'success', true );
+				$this->_page->addVar('validation_message','Le commentaire a bien été ajouté');
+				if ( null != $Comment->fk_NMC() ) {
+					$Comment->setAuteur( $this->_managers->getManagerOf( 'Members' )->getMemberFromId( $Comment->fk_NMC() )->login() );
+				}
+				
+				$this->_managers->getManagerOf( 'Comments' )->add( $Comment );
+				
+				$Comment->date_formated = $Comment->date()->format( 'd/m/Y à H\hi' );
 				$this->_page->addVar( 'Comment', $Comment );
+				$news_author = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $Request->getData( 'news' ) );
+				
+				
+				if ( $this->getUser()->isAuthenticated() ) {
+					if ( $this->loggedUserIsAdmin() ) {
+						$Comment->link_update = $this->app()->router()->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $Comment[ 'id' ] ] );
+						$Comment->link_delete = $this->app()->router()->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $Comment[ 'id' ] ] );
+					}
+					else {
+						$status = self::STATUS_MEMBER_MEMBER;
+						if ( $Comment[ 'fk_NMC' ] != null ) {
+							$status = $this->_managers->getManagerOf( 'Members' )->getStatusMemberFromId( $Comment[ 'fk_NMC' ] );
+						}
+						if ( $status != self::STATUS_MEMBER_ADMIN
+							 && ( $this->getUser()->getLogin() == $Comment[ 'auteur' ] || $this->getUser()->getLogin() == $news_author
+								  || $this->loggedUserIsAdmin() )
+						) {
+							$Comment->link_update = $this->app()->router()->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $Comment[ 'id' ] ] );
+							$Comment->link_delete = $this->app()->router()->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $Comment[ 'id' ] ] );
+						}
+					}
+				}
 			}
 		}
-		
 	}
 }
