@@ -8,7 +8,7 @@ $( document ).ready( function() {
 		var $champ_a = $current_form.find( '[name=auteur],textarea' );
 		var $erreur  = $current_form.find( '.js-error' );
 		var $contenu = $current_form.find( 'textarea' );
-		var $valid = $current_form.find( '.js-valid' );
+		var $valid   = $current_form.find( '.js-valid' );
 		
 		//event.preventDefault();
 		
@@ -28,38 +28,25 @@ $( document ).ready( function() {
 			data     : p_data,
 			dataType : 'json',
 			success  : function( data ) {
+				//si l'insertion a échoué, on affiche le message d'erreur correspondant et on indique
+				//le champ qui a provoqué l'erreur
 				if ( false === data.content.success ) {
+					$valid.html( "" );
 					$erreur.html( "" );
-					$erreur.prepend( data.error_message );
-					$champ_a.css({
-						borderColor:'#eee'
-					});
-					if ( 2 === data.error_code ) {
-						$contenu.css( {
-							borderColor : 'red'
-						} )
-					}
-					if ( 1 === data.error_code ) {
-						$contenu.css( {
-							borderColor : 'red'
-						} );
-						$auteur.css( {
-							borderColor : 'red'
-						} )
-					}
-					if ( 3 === data.error_code ) {
-						$auteur.css( {
-							borderColor : 'red'
-						} )
-					}
-					if ( 4 === data.error_code ) {
-						$auteur.css( {
-							borderColor : 'red'
-						} )
-					}
+					$champ_a.css( {
+						borderColor : '#eee'
+					} );
+					
+					$current_form.find('[name='+data.content.name+']')
+								 .before($("<div class='js-error'></div>").text(data.content.error_message))
+						.css({
+							borderColor:'red'
+						});
 					return;
 				}
 				
+				
+				//si l'insertion a réussi, on insère le commentaire et on affiche un message de validation
 				$contenu.css( {
 					borderColor : '#eee'
 				} );
@@ -67,7 +54,8 @@ $( document ).ready( function() {
 					borderColor : '#eee'
 				} );
 				$( 'fieldset:last' ).after( comment_buildCommentHTMLRendering( data.content.comment ) );
-				$erreur.html(data.validation_message);
+				$valid.html( data.content.validation_message );
+				$erreur.html("");
 				$( '[name=contenu]' ).val( "" );
 				$( '[name=auteur]' ).val( "" );
 				
@@ -77,8 +65,33 @@ $( document ).ready( function() {
 	} );
 } );
 
+setInterval( function() {
+	var last_id_comment = $( 'fieldset:last' ).attr( 'id' );
+	console.log(last_id_comment);
+	$.ajax( {
+		type : "POST",
+		url  : $('.js-comment-list').data('url'),
+		data : {
+			id : last_id_comment
+		},
+		dataType : 'json',
+		success : function(data){
+			if(data.content.success === true) {
+				$.each(data.content.Comments, function(key,val){
+					//console.log(val);
+					$( 'fieldset:last' ).after( comment_buildCommentHTMLRendering( val ) );
+				});
+				
+			}
+		}
+	} );
+	
+	//
+}, 3000 );
+
+
 function comment_buildCommentHTMLRendering( comment ) {
-	return $( '<fieldset></fieldset>' )
+	return $( '<fieldset></fieldset>' ).attr('id',comment.id)
 		.append( $( '<legend></legend>' )
 			.append( 'Posté par ', $( '<strong></strong>' ).text( comment.auteur ), ' le ' + comment.date + ' ' )
 			.append( comment.link_update ? $( '<a></a>' )
@@ -88,3 +101,5 @@ function comment_buildCommentHTMLRendering( comment ) {
 				.text( 'Supprimer' ) : '' ), $( '<p></p>' )
 			.text( comment.contenu ) );
 }
+
+

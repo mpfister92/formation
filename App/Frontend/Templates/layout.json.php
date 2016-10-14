@@ -9,9 +9,9 @@
 $return = [];
 
 
-$return[ 'error_code' ]       = ( isset( $error_code ) ) ? $error_code : 0;
-$return[ 'error_message' ]    = ( isset( $error_message ) ) ? $error_message : '';
-$return[ 'validation_message' ] = ( isset( $validation_message ) ) ? $validation_message : '';
+$return[ 'master_code' ]       = ( isset( $master_code) ) ? $master_code: 0;
+$return[ 'master_error' ]    = ( isset( $master_error ) ) ? $master_error: '';
 $return[ 'content' ]          = $content;
+
 
 return $return;

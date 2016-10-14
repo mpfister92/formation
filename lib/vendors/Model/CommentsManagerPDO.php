@@ -51,15 +51,22 @@ class CommentsManagerPDO extends CommentsManager {
 	 *
 	 * @return Comment[]
 	 */
-	public function getListOf( $news ) {
-		$sql = 'SELECT NCC_id AS id,NCC_fk_NNC AS news,NCC_auteur AS auteur,NCC_contenu AS contenu,NCC_date AS date,NCC_id AS id, NCC_fk_NCE AS fk_NCE, NCC_fk_NMC AS fk_NMC 
+	public function getListOf( $news, $Comment_id = null ) {
+		$sql = 'SELECT NCC_id AS id,NCC_fk_NNC AS fk_NNC,NCC_auteur AS auteur,NCC_contenu AS contenu,NCC_date AS date,NCC_id AS id, NCC_fk_NCE AS fk_NCE, NCC_fk_NMC AS fk_NMC 
                 FROM t_new_commentc
                 WHERE NCC_fk_NNC = :news
                 AND NCC_fk_NCE = :state';
 		
+		if(null != $Comment_id){
+			$sql .= ' AND NCC_id > :comment_id';
+		}
+		
 		$requete = $this->_dao->prepare( $sql );
 		$requete->bindValue( ':news', $news, \PDO::PARAM_INT );
 		$requete->bindValue( ':state', self::COMMENT_STATE_VALID );
+		if(null != $Comment_id){
+			$requete->bindValue(':comment_id',$Comment_id, \PDO::PARAM_INT);
+		}
 		
 		$requete->execute();
 		
@@ -206,4 +213,10 @@ class CommentsManagerPDO extends CommentsManager {
 		
 		return $result;
 	}
+	
+	/*public function getCommentBefore($news_id,$comment_id){
+		$sql = 'SELECT 
+				FROM t_new_commentc
+				WHERE '
+	}*/
 }

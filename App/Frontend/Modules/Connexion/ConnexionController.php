@@ -20,20 +20,20 @@ class ConnexionController extends BackController {
 		$this->run();
 		
 		if ( $Request->method() == 'POST' ) {
-			$member = new Member( [
+			$Member = new Member( [
 				'login'                 => $Request->postData( 'login' ),
 				'password'              => $Request->postData( 'password' ),
 				'email'                 => $Request->postData( 'email' ),
 				'password_confirmation' => $Request->postData( 'password_confirmation' ),
 				'email_confirmation'    => $Request->postData( 'email_confirmation' ),
 			] );
-			$member->setUser_Type(self::USER_TYPE_MEMBER);
+			$Member->setFk_NMY(self::USER_TYPE_MEMBER);
 		}
 		else {
-			$member = new Member;
+			$Member = new Member;
 		}
 		
-		$formBuilder = new MemberFormBuilder( $member );
+		$formBuilder = new MemberFormBuilder( $Member );
 		$formBuilder->build( $this->_app->user(),$this->_managers->getManagerOf( 'Members' ) );
 		
 		$form = $formBuilder->form();
@@ -46,7 +46,7 @@ class ConnexionController extends BackController {
 		}
 		
 		$this->_page->addVar( 'title', 'Inscription' );
-		$this->_page->addVar( 'member', $member );
+		$this->_page->addVar( 'member', $Member );
 		$this->_page->addVar( 'form', $form->createView() );
 	}
 	

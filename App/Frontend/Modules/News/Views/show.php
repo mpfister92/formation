@@ -17,7 +17,7 @@
 <h3>Postez votre commentaire</h3>
 <form id="form-top" action="insertComment.php" class="js-form-comment-news	" data-ajax-url="<?= $url_response_form ?>">
 	
-	<div class="js-error"></div>
+	<div class="js-valid"></div>
 	<p>
 		<?= $add_comment_form ?>
 		
@@ -29,27 +29,29 @@
 	<p>Aucun commentaire n'a encore été posté. Soyez le premier à en laisser un !</p>
 <?php endif; ?>
 
-<?php foreach ( $List_comments_a as $Comment ): ?>
-	<fieldset>
-		<legend>
-			Posté par
-			<strong>
-				<?= $Comment[ 'comment_author' ] ?>
-			</strong>
-			le <?= $Comment[ 'date_formated' ] ?>
-			<?php if ( isset( $Comment[ 'link_update' ] ) && ( isset( $Comment[ 'link_delete' ] ) ) ): ?>
-				<a href="<?= $Comment[ 'link_update' ] ?>">Modifier</a> -
-				<a href="<?= $Comment[ 'link_delete' ] ?>">Supprimer</a>
-			<?php endif; ?>
-		</legend>
-		<p><?= nl2br( htmlspecialchars( $Comment[ 'contenu' ] ) ) ?></p>
-	</fieldset>
-<?php endforeach; ?>
+<div class="js-comment-list" data-url="<?= $for_refresh_url ?>">
+	<?php foreach ( $Comments_a as $Comment ): ?>
+		<fieldset id="<?= $Comment[ 'id' ] ?>">
+			<legend>
+				Posté par
+				<strong>
+					<?= $Comment[ 'auteur' ] ?>
+				</strong>
+				le <?= $Comment[ 'date_formated' ] ?>
+				<?php if ( isset( $Comment[ 'link_update' ] ) && ( isset( $Comment[ 'link_delete' ] ) ) ): ?>
+					<a href="<?= $Comment[ 'link_update' ] ?>">Modifier</a> -
+					<a href="<?= $Comment[ 'link_delete' ] ?>">Supprimer</a>
+				<?php endif; ?>
+			</legend>
+			<p><?= nl2br( htmlspecialchars( $Comment[ 'contenu' ] ) ) ?></p>
+		</fieldset>
+	<?php endforeach; ?>
+</div>
 
 <h3>Postez votre commentaire</h3>
 <form id="form-bot" action="insertComment.php" class="js-form-comment-news" data-ajax-url="<?= $url_response_form ?>">
 	
-	<div class="js-error"></div>
+	<div class="js-valid"></div>
 	<p>
 		<?= $add_comment_form ?>
 		

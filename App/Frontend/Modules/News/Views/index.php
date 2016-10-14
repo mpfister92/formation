@@ -4,8 +4,8 @@
  */
 ?>
 
-<?php if ( !empty( $List_news_a ) ): ?>
-	<?php foreach ( $List_news_a as $News ): ?>
+<?php if ( !empty( $News_a ) ): ?>
+	<?php foreach ( $News_a as $News ): ?>
 		<h2><a href="<?= $News['link'] ?>"><?= $News['titre'] ?></a></h2>
 		<p><?= nl2br( $News['contenu'] ) ?></p>
 	<?php endforeach; ?>
