@@ -87,6 +87,9 @@ class NewsController extends BackController {
 		$this->_page->addVar( 'for_refresh_url', $this->app()->router()->provideRoute( 'Frontend', 'News', 'getCommentList', [ 'news' => $News[ 'id' ] ] ) );
 	}
 	
+	/** adds the links update and/or delete to the comment when needed
+	 * @param Comment $Comment
+	 */
 	private function addLinksUpdateDeleteToComment(Comment $Comment){
 		
 		//nom de l'auteur de la news
@@ -119,6 +122,11 @@ class NewsController extends BackController {
 		}
 	}
 	
+	/** adding comment form treatment
+	 * @param HTTPRequest $Request
+	 *
+	 * @return Comment
+	 */
 	private function formTreatment( HTTPRequest $Request ) {
 		if ( $Request->method() == 'POST' ) {
 			if ( $Request->postExists( 'auteur' ) ) {
@@ -171,6 +179,9 @@ class NewsController extends BackController {
 		$this->_page->addVar( 'form', $form->createView() );
 	}
 	
+	/** inserts a comment with the ajax method
+	 * @param HTTPRequest $Request
+	 */
 	public function executeInsertCommentAjax( HTTPRequest $Request ) {
 		$this->run();
 		
@@ -218,6 +229,9 @@ class NewsController extends BackController {
 		}
 	}
 	
+	/** adds a list of comments to the page
+	 * @param HTTPRequest $Request
+	 */
 	public function executeGetCommentList( HTTPRequest $Request ) {
 		$this->run();
 		

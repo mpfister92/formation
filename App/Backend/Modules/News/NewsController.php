@@ -27,16 +27,16 @@ class NewsController extends BackController {
 		$manager = $this->_managers->getManagerOf( 'News' );
 		
 		if ( $this->_app->user()->getStatus() == self::STATUS_MEMBER_ADMIN ) {
-			$List_news_a = $manager->getList();
+			$News_a = $manager->getList();
 			$number_news = $manager->countNews();
 		}
 		else {
 			$id = $this->getUser()->getId();
-			$List_news_a = $manager->getList( -1, -1, $id );
+			$News_a = $manager->getList( -1, -1, $id );
 			$number_news = $manager->countNews( $id );
 		}
 		
-		foreach ( $List_news_a as $News ) {
+		foreach ( $News_a as $News ) {
 			$News->link_edition      = $this->app()->router()->provideRoute( 'Backend', 'News', 'update', [ 'id' => $News[ 'id' ] ] );
 			$News->link_delete       = $this->app()->router()->provideRoute( 'Backend', 'News', 'delete', [ 'id' => $News[ 'id' ] ] );
 			$News->dateAjoutFormated = $News->dateAjout()->format( 'd/m/Y à H\hi' );
@@ -44,7 +44,7 @@ class NewsController extends BackController {
 			$News->setMember($this->_managers->getManagerOf('Members')->getMemberFromId($News->fk_NMC()));
 		}
 		
-		$this->_page->addVar( 'List_news_a', $List_news_a );
+		$this->_page->addVar( 'News_a', $News_a );
 		$this->_page->addVar( 'number_news', $number_news );
 		$this->_page->addVar( 'add_news', $this->app()->router()->provideRoute( 'Backend', 'News', 'insert', [] ) );
 	}
@@ -136,16 +136,16 @@ class NewsController extends BackController {
 		if ( $Request->getExists( 'id' ) ) {
 			$id    = $Request->getData( 'id' );
 			$login = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $id );
-			if ( $login == $this->_app->user()->getLogin() || $this->_app->user()->getStatus() == self::STATUS_MEMBER_ADMIN ) {
+			if ( $login != $this->_app->user()->getLogin() && $this->_app->user()->getStatus() != self::STATUS_MEMBER_ADMIN ) {
+				$this->_app->httpResponse()->redirect404();
+			}
+			else {
 				$this->_managers->getManagerOf( 'News' )->delete( $Request->getData( 'id' ) );
 				$this->_managers->getManagerOf( 'Comments' )->deleteFromNews( $Request->getData( 'id' ) );
 				
 				$this->_app->user()->setFlash( 'La news a bien été supprimée !' );
 				
 				$this->_app->httpResponse()->redirect( '.' );
-			}
-			else {
-				$this->_app->httpResponse()->redirect404();
 			}
 		}
 	}
@@ -238,15 +238,15 @@ class NewsController extends BackController {
 			$comment_author = $this->_managers->getManagerOf('Members')->getLoginMemberFromId($id_author);
 		}
 		
-		if ( ( $comment_author != 'admin' && ( $comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin() )
+		if ( !( $comment_author != 'admin' && ( $comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin() )
 			   || ( $this->_app->user()->getStatus() == self::STATUS_MEMBER_ADMIN ) )
 		) {
+			$this->_app->httpResponse()->redirect404();
+		}
+		else {
 			$this->_managers->getManagerOf( 'Comments' )->delete( $Request->getData( 'id' ) );
 			$this->_app->user()->setFlash( 'Le commentaire a bien été supprimé !' );
 			$this->_app->httpResponse()->redirect( $this->app()->router()->provideRoute('Frontend','News','show',[ 'id' => $Comment->fk_NNC()]) );
-		}
-		else {
-			$this->_app->httpResponse()->redirect404();
 		}
 	}
 }

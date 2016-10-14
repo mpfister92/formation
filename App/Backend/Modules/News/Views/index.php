@@ -21,7 +21,7 @@
 			<th>Dernière modification</th>
 			<th>Actions</th>
 		</tr>
-		<?php foreach ( $List_news_a as $News ): ?>
+		<?php foreach ( $News_a as $News ): ?>
 			<tr>
 				<td><?= $News[ 'Member' ]->login() ?>
 				</td>
