@@ -11,7 +11,7 @@ namespace Entity;
 use \OCFram\Entity;
 
 class Comment extends Entity {
-	protected $id,$fk_NNC, $auteur, $contenu, $date, $fk_NCE, $fk_NMC;
+	protected $id,$fk_NNC, $auteur, $contenu, $date, $fk_NCE, $fk_NMC, $dateModif;
 	const AUTEUR_INVALIDE = 1;
 	const TEXT_INVALIDE   = 2;
 	
@@ -20,10 +20,14 @@ class Comment extends Entity {
 	 * @return bool
 	 */
 	public function isValid() {
-		return !(empty( $this->contenu ) || (empty($this->auteur) || !empty($this->fk_NMC)) && (!empty($this->auteur) || empty($this->fk_NMC)) );
+		return !(empty( $this->contenu ));
 	}
 	
 	/** SETTERS */
+	
+	public function setDateModif($dateModif){
+		$this->dateModif = $dateModif;
+	}
 	
 	public function setFk_NNC( $fk_NNC ) {
 		$this->fk_NNC = (int) $fk_NNC;
@@ -79,5 +83,9 @@ class Comment extends Entity {
 	
 	public function fk_NMC() {
 		return $this->fk_NMC;
+	}
+	
+	public function dateModif(){
+		$this->dateModif;
 	}
 }

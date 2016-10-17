@@ -180,7 +180,7 @@ class NewsController extends BackController {
 					$id_author = $this->_managers->getManagerOf( 'Comments' )->getCommentMemberIdFromId( $id_comment );
 					$comment_author = $this->_managers->getManagerOf('Members')->getLoginMemberFromId($id_author);
 				}
-				$comment->setAuteur($comment_author);
+				//$comment->setAuteur($comment_author);
 			}
 		}
 		else {

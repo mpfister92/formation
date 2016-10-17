@@ -5,6 +5,7 @@ if(null == $Comments_a) {
 
 else{
 	$return['success'] = true;
+	$return['new_update_date'] = $new_update_date;
 	foreach ($Comments_a as $Comment){
 		$return['Comments'][$Comment['id']]['id'] = $Comment['id'];
 		$return['Comments'][$Comment['id']]['contenu'] = $Comment['contenu'];

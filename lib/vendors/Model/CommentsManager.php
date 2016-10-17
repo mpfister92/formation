@@ -22,11 +22,12 @@ abstract class CommentsManager extends Manager
     abstract public function add(Comment $comment);
 	
 	/** retourne la liste des commentaires pour une news
-	 * @param $news
+	 * @param News $News
+	 * @param $Comment_date
 	 *
 	 * @return Comment[]
 	 */
-    abstract public function getListOf($news);
+    abstract public function getListOf( $News, $Comment_date);
 	
 	/** update d'un commentaire
 	 * @param Comment $comment

@@ -26,10 +26,10 @@
 			</header>
 			
 			<nav>
-				<ul>
+				<ul id="menu">
 					<?php if ( isset( $menu ) ): ?>
 						<?php foreach ( $menu as $key => $value ): ?>
-							<li><a href="<?= $value ?>"><?= $key ?></a></li>
+							<li class="second-level"><a href="<?= $value ?>"><?= $key ?></a></li>
 						<?php endforeach; ?>
 					<?php endif; ?>
 				</ul>
@@ -50,5 +50,7 @@
 		</div>
 		<script src="/js/jquery-3.1.1.min.js"></script>
 		<script src="/js/news-page.js"></script>
+		<script src="/js/jquery.jrumble.1.3.min.js"></script>
+		<script src="/js/jquery.jmoments.js"></script>
 	</body>
 </html>

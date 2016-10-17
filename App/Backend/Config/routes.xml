@@ -8,4 +8,6 @@
 	<route url="/admin/comment-delete-([0-9]+)\.html" rewrite="/admin/comment-delete-(id).html" module="News" action="deleteComment" vars="id"></route>
 	<route url="/admin/index\.html" rewrite="/admin/index.html" module="Connexion" action="index"></route>
 	<route url="/admin/deconnexion\.html" rewrite="/admin/deconnexion.html" module="Connexion" action="deconnexion"></route>
+	<route url="/admin/comment-update-([0-9]+)\.json" rewrite="/admin/comment-update-(id).json" format="json" module="News" action="updateCommentAjax" vars="id"></route>
+	<route url="/admin/comment-delete-([0-9]+)\.json" rewrite="/admin/comment-delete-(id).json" format="json" module="News" action="deleteCommentAjax" vars="id"></route>
 </routes>

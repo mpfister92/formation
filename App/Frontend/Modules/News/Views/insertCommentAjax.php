@@ -2,6 +2,7 @@
 $return['success'] = $success;
 
 if (isset($Comment)) {
+	$return['new_update_date'] = $new_update_date;
 	$return["comment"]["contenu"] = $Comment['contenu'];
 	$return["comment"]["date"] = $Comment['date_formated'];
 	$return["comment"]["auteur"] = $Comment['auteur'];

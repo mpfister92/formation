@@ -10,7 +10,7 @@ $( document ).ready( function() {
 		var $contenu = $current_form.find( 'textarea' );
 		var $valid   = $current_form.find( '.js-valid' );
 		
-		//event.preventDefault();
+		refresh();
 		
 		var p_data = {
 			contenu : $contenu.val()
@@ -53,41 +53,68 @@ $( document ).ready( function() {
 				$auteur.css( {
 					borderColor : '#eee'
 				} );
-				$( 'fieldset:last' ).after( comment_buildCommentHTMLRendering( data.content.comment ) );
+				if($('fieldset#id').length) {
+					$( 'fieldset:last' ).after( comment_buildCommentHTMLRendering( data.content.comment ) );
+				}
+				else{
+					$('.js-comment-list').append(comment_buildCommentHTMLRendering(data.content.comment));
+					$('.js-exists-comment').html("");
+				}
+				
+				$( 'fieldset:last' ).css({
+					opacity : 0
+				});
+				$( 'fieldset:last' ).fadeTo('slow',1);
+				
 				$valid.html( data.content.validation_message );
 				$erreur.html("");
 				$( '[name=contenu]' ).val( "" );
 				$( '[name=auteur]' ).val( "" );
 				
+				$('.js-comment-list').data('date-last-update',data.content.new_update_date);
 			}
 		} );
 		return false;
 	} );
 } );
 
-setInterval( function() {
-	var last_id_comment = $( 'fieldset:last' ).attr( 'id' );
-	console.log(last_id_comment);
+function refresh(){
+	var date = $('.js-comment-list').data('date-last-update');
 	$.ajax( {
 		type : "POST",
 		url  : $('.js-comment-list').data('url'),
 		data : {
-			id : last_id_comment
+			date : date
 		},
 		dataType : 'json',
 		success : function(data){
 			if(data.content.success === true) {
+				$('.js-comment-list').data('date-last-update',data.content.new_update_date);
 				$.each(data.content.Comments, function(key,val){
-					//console.log(val);
-					$( 'fieldset:last' ).after( comment_buildCommentHTMLRendering( val ) );
+					//si un id de commentaire existe deja (modification) on replace le commentaire
+					if($('fieldset[id-comment='+key+']').length){
+						var to_replace = comment_buildCommentHTMLRendering( val );
+						$('fieldset[id-comment='+key+']').replaceWith(to_replace);
+					}
+					//sinon on rajoute le commentaire en fin de page
+					else {
+						if ( $( 'fieldset:last' ).length ) {
+							$( 'fieldset:last' ).after( comment_buildCommentHTMLRendering( val ) );
+						}
+						else {
+							$( '.js-comment-list' ).append( comment_buildCommentHTMLRendering( val ) );
+							$( '.js-exists-comment' ).html( "" );
+						}
+					}
 				});
-				
 			}
 		}
 	} );
-	
-	//
-}, 3000 );
+}
+
+setInterval( function() {
+	refresh();
+},8000 );
 
 
 function comment_buildCommentHTMLRendering( comment ) {
@@ -101,5 +128,32 @@ function comment_buildCommentHTMLRendering( comment ) {
 				.text( 'Supprimer' ) : '' ), $( '<p></p>' )
 			.text( comment.contenu ) );
 }
+
+$('[name=submit]').on('mouseover',function(clic){
+	var $this = $(this);
+	$this.jrumble({
+		x : 2,
+		y : 2,
+		rotation : 1,
+		speed : 70
+	});
+	$this.css({
+		borderColor : '#237fbe',
+		fontWeight : 'bold'
+	});
+	$this.trigger('startRumble');
+});
+
+$('[name=submit]').on('mouseleave',function(clic){
+	var $this = $(this);
+	$this.css({
+		borderColor : '#eee',
+		fontWeight : 'normal'
+	});
+	$this.trigger('stopRumble');
+});
+
+
+
 
 

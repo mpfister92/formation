@@ -21,17 +21,17 @@
 	<p>
 		<?= $add_comment_form ?>
 		
-		<input type="submit" id="send_form_top" value="Commenter" />
+		<input type="submit" id="send_form_top" name="submit" value="Commenter" />
 	</p>
 </form>
 
-<?php if ( empty( $List_comments_a ) ): ?>
-	<p>Aucun commentaire n'a encore été posté. Soyez le premier à en laisser un !</p>
+<?php if ( empty( $Comments_a ) ): ?>
+	<p class="js-exists-comment">Aucun commentaire n'a encore été posté. Soyez le premier à en laisser un !</p>
 <?php endif; ?>
 
-<div class="js-comment-list" data-url="<?= $for_refresh_url ?>">
+<div class="js-comment-list" data-url="<?= $for_refresh_url ?>" data-date-last-update="<?= $last_update_date ?>">
 	<?php foreach ( $Comments_a as $Comment ): ?>
-		<fieldset id="<?= $Comment[ 'id' ] ?>">
+		<fieldset class="comment" id-comment="<?= $Comment[ 'id' ] ?>">
 			<legend>
 				Posté par
 				<strong>
@@ -39,11 +39,11 @@
 				</strong>
 				le <?= $Comment[ 'date_formated' ] ?>
 				<?php if ( isset( $Comment[ 'link_update' ] ) && ( isset( $Comment[ 'link_delete' ] ) ) ): ?>
-					<a href="<?= $Comment[ 'link_update' ] ?>">Modifier</a> -
-					<a href="<?= $Comment[ 'link_delete' ] ?>">Supprimer</a>
+					<a class="js-update-url" href="<?= $Comment[ 'link_update' ] ?>" data-update-url="<?= $for_update_comment_url ?>">Modifier</a> -
+					<a class="js-delete-url" href="<?= $Comment[ 'link_delete' ] ?>" data-update-url="<?= $for_delete_comment_url ?>">Supprimer</a>
 				<?php endif; ?>
 			</legend>
-			<p><?= nl2br( htmlspecialchars( $Comment[ 'contenu' ] ) ) ?></p>
+			<p class="contenu"><?= nl2br( htmlspecialchars( $Comment[ 'contenu' ] ) ) ?></p>
 		</fieldset>
 	<?php endforeach; ?>
 </div>
@@ -55,7 +55,7 @@
 	<p>
 		<?= $add_comment_form ?>
 		
-		<input type="submit" id="send_form_bot" value="Commenter" />
+		<input type="submit" id="send_form_bot" name="submit" value="Commenter" />
 	</p>
 </form>
 

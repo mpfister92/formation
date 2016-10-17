@@ -67,6 +67,9 @@ class NewsController extends BackController {
 			$Comment->date_formated = $Comment->date()->format( 'd/m/Y à H\hi' );
 			
 			$this->addLinksUpdateDeleteToComment($Comment);
+			$this->_page->addVar('for_update_comment_url',$this->app()->router()->provideRoute('Backend','News','updateCommentAjax',['id' => $Comment['id']]));
+			$this->_page->addVar('for_delete_comment_url',$this->app()->router()->provideRoute('Backend','News','updateCommentAjax',['id' => $Comment['id']]));
+		
 		}
 		
 		$formBuilder = new CommentFormBuilder( new Comment() );
@@ -85,6 +88,9 @@ class NewsController extends BackController {
 		$this->_page->addVar( 'url_response_form', $this->app()->router()->provideRoute( 'Frontend', 'News', 'insertCommentAjax', [ 'news' => $News[ 'id' ] ] ) );
 		
 		$this->_page->addVar( 'for_refresh_url', $this->app()->router()->provideRoute( 'Frontend', 'News', 'getCommentList', [ 'news' => $News[ 'id' ] ] ) );
+		
+		$last_update_date = $this->_managers->getManagerOf('Comments')->getMaxEditionDate();
+		$this->_page->addVar('last_update_date',$last_update_date);
 	}
 	
 	/** adds the links update and/or delete to the comment when needed
@@ -227,6 +233,8 @@ class NewsController extends BackController {
 				$this->_page->addVar( 'Comment', $Comment );
 			}
 		}
+		
+		$this->_page->addVar('new_update_date',$this->_managers->getManagerOf('Comments')->getMaxEditionDate());
 	}
 	
 	/** adds a list of comments to the page
@@ -236,18 +244,17 @@ class NewsController extends BackController {
 		$this->run();
 		
 		$News_id = $Request->getData( 'news' );
-		$last_Comment_id = $Request->postData('id');
 		
-		$Comments_a = $this->_managers->getManagerOf( 'Comments' )->getListOf( $News_id , $last_Comment_id);
+		$date = $Request->postData('date');
 		
-		//nom de l'auteur de la news
-		$news_author = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $News_id );
+		$Comments_a = $this->_managers->getManagerOf( 'Comments' )->getListOf( $News_id , $date );
 		
 		foreach ($Comments_a as $Comment) {
 			$Comment->date_formated = $Comment->date()->format( 'd/m/Y à H\hi' );
 			$this->addLinksUpdateDeleteToComment($Comment);
 		}
 		
+		$this->_page->addVar('new_update_date',$this->_managers->getManagerOf('Comments')->getMaxEditionDate());
 		$this->_page->addVar( 'Comments_a', $Comments_a );
 	}
 }
