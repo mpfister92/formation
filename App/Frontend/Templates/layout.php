@@ -49,8 +49,8 @@
 			
 		</div>
 		<script src="/js/jquery-3.1.1.min.js"></script>
-		<script src="/js/news-page.js"></script>
+		<script src="/js/add-comment.js"></script>
 		<script src="/js/jquery.jrumble.1.3.min.js"></script>
-		<script src="/js/jquery.jmoments.js"></script>
+		<script src="/js/refresh-news-page.js"></script>
 	</body>
 </html>

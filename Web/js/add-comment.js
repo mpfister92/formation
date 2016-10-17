@@ -44,8 +44,6 @@ $( document ).ready( function() {
 						});
 					return;
 				}
-				
-				
 				//si l'insertion a réussi, on insère le commentaire et on affiche un message de validation
 				$contenu.css( {
 					borderColor : '#eee'
@@ -53,69 +51,34 @@ $( document ).ready( function() {
 				$auteur.css( {
 					borderColor : '#eee'
 				} );
-				if($('fieldset#id').length) {
-					$( 'fieldset:last' ).after( comment_buildCommentHTMLRendering( data.content.comment ) );
+				
+				var $last_fieldset = $('fieldset:last');
+				var $coments_a = $('.js-comment-list');
+				
+				if($last_fieldset.length) {
+					$last_fieldset.after( comment_buildCommentHTMLRendering( data.content.comment ) );
 				}
 				else{
-					$('.js-comment-list').append(comment_buildCommentHTMLRendering(data.content.comment));
+					$coments_a.append(comment_buildCommentHTMLRendering(data.content.comment));
 					$('.js-exists-comment').html("");
 				}
 				
-				$( 'fieldset:last' ).css({
+				$('fieldset:last').css({
 					opacity : 0
 				});
-				$( 'fieldset:last' ).fadeTo('slow',1);
+				$('fieldset:last').fadeTo('slow',1);
 				
 				$valid.html( data.content.validation_message );
 				$erreur.html("");
 				$( '[name=contenu]' ).val( "" );
 				$( '[name=auteur]' ).val( "" );
 				
-				$('.js-comment-list').data('date-last-update',data.content.new_update_date);
+				$coments_a.data('date-last-update',data.content.new_update_date);
 			}
 		} );
 		return false;
 	} );
 } );
-
-function refresh(){
-	var date = $('.js-comment-list').data('date-last-update');
-	$.ajax( {
-		type : "POST",
-		url  : $('.js-comment-list').data('url'),
-		data : {
-			date : date
-		},
-		dataType : 'json',
-		success : function(data){
-			if(data.content.success === true) {
-				$('.js-comment-list').data('date-last-update',data.content.new_update_date);
-				$.each(data.content.Comments, function(key,val){
-					//si un id de commentaire existe deja (modification) on replace le commentaire
-					if($('fieldset[id-comment='+key+']').length){
-						var to_replace = comment_buildCommentHTMLRendering( val );
-						$('fieldset[id-comment='+key+']').replaceWith(to_replace);
-					}
-					//sinon on rajoute le commentaire en fin de page
-					else {
-						if ( $( 'fieldset:last' ).length ) {
-							$( 'fieldset:last' ).after( comment_buildCommentHTMLRendering( val ) );
-						}
-						else {
-							$( '.js-comment-list' ).append( comment_buildCommentHTMLRendering( val ) );
-							$( '.js-exists-comment' ).html( "" );
-						}
-					}
-				});
-			}
-		}
-	} );
-}
-
-setInterval( function() {
-	refresh();
-},8000 );
-
 
 function comment_buildCommentHTMLRendering( comment ) {
 	return $( '<fieldset></fieldset>' ).attr('id',comment.id)
@@ -129,7 +92,9 @@ function comment_buildCommentHTMLRendering( comment ) {
 			.text( comment.contenu ) );
 }
 
-$('[name=submit]').on('mouseover',function(clic){
+
+var $submit_field = $('[name=submit]');
+$submit_field.on('mouseover',function(clic){
 	var $this = $(this);
 	$this.jrumble({
 		x : 2,
@@ -144,7 +109,7 @@ $('[name=submit]').on('mouseover',function(clic){
 	$this.trigger('startRumble');
 });
 
-$('[name=submit]').on('mouseleave',function(clic){
+$submit_field.on('mouseleave',function(clic){
 	var $this = $(this);
 	$this.css({
 		borderColor : '#eee',
