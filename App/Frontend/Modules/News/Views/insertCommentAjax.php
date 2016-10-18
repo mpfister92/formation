@@ -8,9 +8,13 @@ if (isset($Comment)) {
 	$return["comment"]["auteur"] = $Comment['auteur'];
 	$return["comment"]["fk_NNC"] = $Comment['fk_NNC'];
 	$return["comment"]["id"] = $Comment["id"];
+	$return["comment"]["fk_NCE"] = $Comment["fk_NCE"];
 	if(isset($Comment['link_update']) && isset($Comment['link_delete'])) {
 		$return[ "comment" ][ "link_update" ] = $Comment[ 'link_update' ];
 		$return[ "comment" ][ "link_delete" ] = $Comment[ 'link_delete' ];
+	}
+	if(isset($Comment['summary_link'])){
+		$return['comment']['summary_link'] = $Comment['summary_link'];
 	}
 }
 if (isset($error_message)) {

@@ -6,7 +6,7 @@
 
 <?php if ( !empty( $News_a ) ): ?>
 	<?php foreach ( $News_a as $News ): ?>
-		<h2><a href="<?= $News['link'] ?>"><?= $News['titre'] ?></a></h2>
+		<h2><a href="<?= $News['link'] ?>"><?= $News['titre'] ?></a> par <a href="<?= $News['link_auteur'] ?>"><?= $News['auteur'] ?></a></h2>
 		<p><?= nl2br( $News['contenu'] ) ?></p>
 	<?php endforeach; ?>
 

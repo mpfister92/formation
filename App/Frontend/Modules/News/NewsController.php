@@ -15,6 +15,9 @@ use \OCFram\FormHandler;
 class NewsController extends BackController {
 	use AppController;
 	
+	const COMMENT_STATE_VALID = 1;
+	const COMMENT_STATE_INVALID = 2;
+	
 	/** affichage des news sur la page d'accueil
 	 *
 	 * @param HTTPRequest $Request
@@ -37,6 +40,8 @@ class NewsController extends BackController {
 			$shorten_content = mb_strimwidth( $News->contenu(), 0, $number_characters, "..." );
 			$News->setContenu( $shorten_content );
 			$News->link = $this->app()->router()->provideRoute( 'Frontend', 'News', 'show', [ 'id' => $News[ 'id' ] ] );
+			$News->auteur = $this->_managers->getManagerOf('Members')->getLoginMemberFromId($News['fk_NMC']);
+			$News->link_auteur = $this->app()->router()->provideRoute('Frontend','News','getSummaryMember',['id' => $News['fk_NMC']]);
 		}
 		
 		$this->_page->addVar( 'News_a', $News_a );
@@ -58,7 +63,7 @@ class NewsController extends BackController {
 		}
 		
 		//liste des commentaires
-		$Comments_a = $this->_managers->getManagerOf( 'Comments' )->getListOf( $News->id() );
+		$Comments_a = $this->_managers->getManagerOf( 'Comments' )->getListOf( $News->id(), null, self::COMMENT_STATE_VALID );
 		
 		//nom de l'auteur de la news
 		$news_author = $this->_managers->getManagerOf( 'News' )->getLoginFromNewsId( $News->id() );
@@ -68,7 +73,7 @@ class NewsController extends BackController {
 			
 			$this->addLinksUpdateDeleteToComment($Comment);
 			$this->_page->addVar('for_update_comment_url',$this->app()->router()->provideRoute('Backend','News','updateCommentAjax',['id' => $Comment['id']]));
-			$this->_page->addVar('for_delete_comment_url',$this->app()->router()->provideRoute('Backend','News','updateCommentAjax',['id' => $Comment['id']]));
+			$this->_page->addVar('for_delete_comment_url',$this->app()->router()->provideRoute('Backend','News','deleteCommentAjax',['id' => $Comment['id']]));
 		
 		}
 		
@@ -91,6 +96,9 @@ class NewsController extends BackController {
 		
 		$last_update_date = $this->_managers->getManagerOf('Comments')->getMaxEditionDate();
 		$this->_page->addVar('last_update_date',$last_update_date);
+		
+		//lien vers le résumé de l'auteur
+		$News->link_auteur = $this->app()->router()->provideRoute('Frontend','News','getSummaryMember',['id' => $News['fk_NMC']]);
 	}
 	
 	/** adds the links update and/or delete to the comment when needed
@@ -110,7 +118,7 @@ class NewsController extends BackController {
 		if ( $this->getUser()->isAuthenticated() ) {
 			if ( $this->loggedUserIsAdmin() ) {
 				$Comment->link_update = $this->app()->router()->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $Comment[ 'id' ] ] );
-				$Comment->link_delete = $this->app()->router()->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $Comment[ 'id' ] ] );
+				$Comment->link_delete = $this->app()->router()->provideRoute( 'Backend', 'News', 'deleteCommentAjax', [ 'id' => $Comment[ 'id' ] ] );
 			}
 			else {
 				$status = self::STATUS_MEMBER_MEMBER;
@@ -122,7 +130,7 @@ class NewsController extends BackController {
 						  || $this->loggedUserIsAdmin() )
 				) {
 					$Comment->link_update = $this->app()->router()->provideRoute( 'Backend', 'News', 'updateComment', [ 'id' => $Comment[ 'id' ] ] );
-					$Comment->link_delete = $this->app()->router()->provideRoute( 'Backend', 'News', 'deleteComment', [ 'id' => $Comment[ 'id' ] ] );
+					$Comment->link_delete = $this->app()->router()->provideRoute( 'Backend', 'News', 'deleteCommentAjax', [ 'id' => $Comment[ 'id' ] ] );
 				}
 			}
 		}
@@ -230,6 +238,9 @@ class NewsController extends BackController {
 				$this->_managers->getManagerOf( 'Comments' )->add( $Comment );
 				$Comment->date_formated = $Comment->date()->format( 'd/m/Y à H\hi' );
 				$this->addLinksUpdateDeleteToComment($Comment);
+				if(null != $Comment['fk_NMC']) {
+					$Comment->summary_link = $this->app()->router()->provideRoute( 'Frontend', 'News', 'getSummaryMember', [ 'id' => $Comment[ 'fk_NMC' ] ] );
+				}
 				$this->_page->addVar( 'Comment', $Comment );
 			}
 		}
@@ -256,5 +267,40 @@ class NewsController extends BackController {
 		
 		$this->_page->addVar('new_update_date',$this->_managers->getManagerOf('Comments')->getMaxEditionDate());
 		$this->_page->addVar( 'Comments_a', $Comments_a );
+	}
+	
+	public function executeGetSummaryMember(HTTPRequest $Request){
+		$this->run();
+		
+		
+		$id_member = $Request->getData('id');
+		$login_member = $this->_managers->getManagerOf('Members')->getLoginMemberFromId($id_member);
+		$News_a = $this->_managers->getManagerOf('Members')->getNewsAndCommentUsingMemberId_a($id_member);
+		
+		foreach ($News_a as $News){
+			$id_member = $News['fk_NMC'];
+			$News_a[$News['id']]['auteur_news'] = $this->_managers->getManagerOf('Members')->getLoginMemberFromId($id_member);
+			$dateAjout_news = new \DateTime($News['dateAjout']);
+			$dateModif_news = new \DateTime($News['dateModif']);
+			$date_formated_ajout_news = $dateAjout_news->format( 'd/m/Y à H\hi' );
+			$date_formated_modif_news = $dateModif_news->format( 'd/m/Y à H\hi' );
+			$News_a[$News['id']]['dateAjout'] = $date_formated_ajout_news;
+			$News_a[$News['id']]['dateModif'] = $date_formated_modif_news;
+			
+			foreach ($News['comments'] as $Comment){
+				$dateAjout_comment = new \DateTime($Comment['date_comment']);
+				$dateModif_comment = new \DateTime($Comment['date_last_update']);
+				$date_formated_ajout_comment = $dateAjout_comment->format( 'd/m/Y à H\hi' );
+				$date_formated_modif_comment = $dateModif_comment->format( 'd/m/Y à H\hi' );
+				$News_a[$News['id']]['comments'][$Comment['id_comment']]['date_comment'] = $date_formated_ajout_comment;
+				$News_a[$News['id']]['comments'][$Comment['id_comment']]['date_last_update'] = $date_formated_modif_comment;
+//				var_dump($Comment);die();
+			}
+			
+		}
+		
+		$this->_page->addVar('News_a',$News_a);
+		$this->_page->addVar('login_member',$login_member);
+//		var_dump($News_a['58']);die();
 	}
 }

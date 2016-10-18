@@ -27,12 +27,12 @@ class NewsController extends BackController {
 		$manager = $this->_managers->getManagerOf( 'News' );
 		
 		if ( $this->_app->user()->getStatus() == self::STATUS_MEMBER_ADMIN ) {
-			$News_a = $manager->getList();
+			$News_a      = $manager->getList();
 			$number_news = $manager->countNews();
 		}
 		else {
-			$id = $this->getUser()->getId();
-			$News_a = $manager->getList( -1, -1, $id );
+			$id          = $this->getUser()->getId();
+			$News_a      = $manager->getList( -1, -1, $id );
 			$number_news = $manager->countNews( $id );
 		}
 		
@@ -41,7 +41,7 @@ class NewsController extends BackController {
 			$News->link_delete       = $this->app()->router()->provideRoute( 'Backend', 'News', 'delete', [ 'id' => $News[ 'id' ] ] );
 			$News->dateAjoutFormated = $News->dateAjout()->format( 'd/m/Y à H\hi' );
 			$News->dateModifFormated = $News->dateModif()->format( 'd/m/Y à H\hi' );
-			$News->setMember($this->_managers->getManagerOf('Members')->getMemberFromId($News->fk_NMC()));
+			$News->setMember( $this->_managers->getManagerOf( 'Members' )->getMemberFromId( $News->fk_NMC() ) );
 		}
 		
 		$this->_page->addVar( 'News_a', $News_a );
@@ -168,17 +168,17 @@ class NewsController extends BackController {
 				] );
 			}
 			else {
-				$comment = new Comment ( [
+				$comment    = new Comment ( [
 					'id'      => $Request->getData( 'id' ),
 					'contenu' => $Request->postData( 'contenu' ),
 				] );
-				$id_comment = $Request->getData('id');
-				if(null != $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment )) {
+				$id_comment = $Request->getData( 'id' );
+				if ( null != $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment ) ) {
 					$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
 				}
-				else{
-					$id_author = $this->_managers->getManagerOf( 'Comments' )->getCommentMemberIdFromId( $id_comment );
-					$comment_author = $this->_managers->getManagerOf('Members')->getLoginMemberFromId($id_author);
+				else {
+					$id_author      = $this->_managers->getManagerOf( 'Comments' )->getCommentMemberIdFromId( $id_comment );
+					$comment_author = $this->_managers->getManagerOf( 'Members' )->getLoginMemberFromId( $id_author );
 				}
 				//$comment->setAuteur($comment_author);
 			}
@@ -188,15 +188,15 @@ class NewsController extends BackController {
 		}
 		
 		if ( $Request->getExists( 'id' ) ) {
-			$id_comment     = $Request->getData( 'id' );
-			$Comment = $this->_managers->getManagerOf('Comments')->get($id_comment);
-			$news_author    = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
-			if(null != $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment )) {
+			$id_comment  = $Request->getData( 'id' );
+			$Comment     = $this->_managers->getManagerOf( 'Comments' )->get( $id_comment );
+			$news_author = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
+			if ( null != $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment ) ) {
 				$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
 			}
-			else{
-				$id_author = $this->_managers->getManagerOf( 'Comments' )->getCommentMemberIdFromId( $id_comment );
-				$comment_author = $this->_managers->getManagerOf('Members')->getLoginMemberFromId($id_author);
+			else {
+				$id_author      = $this->_managers->getManagerOf( 'Comments' )->getCommentMemberIdFromId( $id_comment );
+				$comment_author = $this->_managers->getManagerOf( 'Members' )->getLoginMemberFromId( $id_author );
 			}
 			if ( ( $comment_author != 'admin' && ( $comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin() )
 				   || ( $this->_app->user()->getStatus() == self::STATUS_MEMBER_ADMIN ) )
@@ -210,7 +210,7 @@ class NewsController extends BackController {
 				
 				if ( $formHandler->process() ) {
 					$this->_app->user()->setFlash( 'Le commentaire a bien été modifié !' );
-					$this->_app->httpResponse()->redirect( $this->app()->router()->provideRoute('Frontend','News','show',['id' => $Comment->fk_NNC()]) );
+					$this->_app->httpResponse()->redirect( $this->app()->router()->provideRoute( 'Frontend', 'News', 'show', [ 'id' => $Comment->fk_NNC() ] ) );
 				}
 				$this->_page->addVar( 'form', $form->createView() );
 			}
@@ -227,26 +227,57 @@ class NewsController extends BackController {
 	public function executeDeleteComment( HTTPRequest $Request ) {
 		$this->run();
 		
-		$id_comment     = $Request->getData( 'id' );
-		$Comment = $this->_managers->getManagerOf('Comments')->get($id_comment);
-		$news_author    = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
-		if(null != $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment )) {
+		$id_comment  = $Request->getData( 'id' );
+		$Comment     = $this->_managers->getManagerOf( 'Comments' )->get( $id_comment );
+		$news_author = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
+		if ( null != $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment ) ) {
 			$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
 		}
-		else{
-			$id_author = $this->_managers->getManagerOf( 'Comments' )->getCommentMemberIdFromId( $id_comment );
-			$comment_author = $this->_managers->getManagerOf('Members')->getLoginMemberFromId($id_author);
+		else {
+			$id_author      = $this->_managers->getManagerOf( 'Comments' )->getCommentMemberIdFromId( $id_comment );
+			$comment_author = $this->_managers->getManagerOf( 'Members' )->getLoginMemberFromId( $id_author );
 		}
 		
 		if ( !( $comment_author != 'admin' && ( $comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin() )
-			   || ( $this->_app->user()->getStatus() == self::STATUS_MEMBER_ADMIN ) )
+				|| ( $this->_app->user()->getStatus() == self::STATUS_MEMBER_ADMIN ) )
 		) {
 			$this->_app->httpResponse()->redirect404();
 		}
 		else {
 			$this->_managers->getManagerOf( 'Comments' )->delete( $Request->getData( 'id' ) );
 			$this->_app->user()->setFlash( 'Le commentaire a bien été supprimé !' );
-			$this->_app->httpResponse()->redirect( $this->app()->router()->provideRoute('Frontend','News','show',[ 'id' => $Comment->fk_NNC()]) );
+			$this->_app->httpResponse()->redirect( $this->app()->router()->provideRoute( 'Frontend', 'News', 'show', [ 'id' => $Comment->fk_NNC() ] ) );
+		}
+	}
+	
+	/** deletes comment with Ajax
+	 *
+	 * @param HTTPRequest $Request
+	 */
+	public function executeDeleteCommentAjax( HTTPRequest $Request ) {
+		$this->run();
+		
+		
+		$id_comment  = $Request->postData( 'id_comment' );
+		$Comment     = $this->_managers->getManagerOf( 'Comments' )->get( $id_comment );
+		$news_author = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
+		if ( null != $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment ) ) {
+			$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
+		}
+		else {
+			$id_author      = $this->_managers->getManagerOf( 'Comments' )->getCommentMemberIdFromId( $id_comment );
+			$comment_author = $this->_managers->getManagerOf( 'Members' )->getLoginMemberFromId( $id_author );
+		}
+		
+		if ( !( $comment_author != 'admin' && ( $comment_author == $this->_app->user()->getLogin() || $news_author == $this->_app->user()->getLogin() )
+				|| ( $this->_app->user()->getStatus() == self::STATUS_MEMBER_ADMIN ) )
+		) {
+			$this->_app->httpResponse()->redirect404();
+		}
+		else {
+			$this->_managers->getManagerOf( 'Comments' )->delete( $id_comment );
+			$this->_page->addVar('deleted_Comment',$Comment);
+			$this->_page->addVar('success',true);
 		}
 	}
 }

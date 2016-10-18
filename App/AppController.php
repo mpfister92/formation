@@ -33,6 +33,7 @@ trait AppController {
 			if ( $user->getStatus() == self::STATUS_MEMBER_MEMBER ) {
 				$menu[ 'Vos news' ] = $this->app()->router()->provideRoute( 'Backend', 'News', 'index', [] );
 			}
+			$menu[ 'Résumé' ]       = $this->app()->router()->provideRoute( 'Frontend', 'News', 'getSummaryMember', ['id' => $user->getId()] );
 			$menu [ 'Ajouter une news' ] = $this->app()->router()->provideRoute( 'Backend', 'News', 'insert', [] );
 			$menu[ 'Deconnexion' ]       = $this->app()->router()->provideRoute( 'Backend', 'Connexion', 'deconnexion', [] );
 		}

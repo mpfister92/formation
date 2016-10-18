@@ -27,7 +27,7 @@ abstract class CommentsManager extends Manager
 	 *
 	 * @return Comment[]
 	 */
-    abstract public function getListOf( $News, $Comment_date);
+    abstract public function getListOf( $News, $Comment_date=null, $state=null);
 	
 	/** update d'un commentaire
 	 * @param Comment $comment
@@ -79,5 +79,8 @@ abstract class CommentsManager extends Manager
 	 *
 	 * @return string
 	 */
+	abstract public function getListOfCommentsForMember($id_member);
+
+	abstract public function getlistCommentForNewsAndIdMember($id_news,$id_member);
 	//abstract public function getCommentAuthorFromId($id);
 }

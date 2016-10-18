@@ -57,7 +57,7 @@ class NewsManagerPDO extends NewsManager {
 	 * @return News
 	 */
 	public function getNews( $id ) {
-		$sql = 'SELECT NNC_id AS id,NNC_fk_NMC AS auteur,NNC_titre AS titre,NNC_contenu AS contenu,NNC_dateAjout AS dateAjout,NNC_dateModif AS dateModif
+		$sql = 'SELECT NNC_id AS id,NNC_fk_NMC AS fk_NMC,NNC_titre AS titre,NNC_contenu AS contenu,NNC_dateAjout AS dateAjout,NNC_dateModif AS dateModif
                 FROM t_new_newsc
                 WHERE NNC_id = :id';
 		
@@ -182,4 +182,6 @@ class NewsManagerPDO extends NewsManager {
 		
 		return ( $result = $requete->fetchColumn() );
 	}
+	
+	
 }

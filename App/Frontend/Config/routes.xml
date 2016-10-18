@@ -7,4 +7,5 @@
 	<route url="/inscription\.html" rewrite="/inscription.html" module="Connexion" action="inscription"></route>
 	<route url="/commenter-([0-9]+)\.json" rewrite="/commenter-(news).json" format="json" module="News" action="insertCommentAjax" vars="news"></route>
 	<route url="/refresh-news-([0-9]+)\.json" rewrite="/refresh-news-(news).json" format="json" module="News" action="getCommentList" vars="news"></route>
+	<route url="/summary-member-([0-9]+)\.html" rewrite="/summary-member-(id).html" module="News" action="getSummaryMember" vars="id"></route>
 </routes>

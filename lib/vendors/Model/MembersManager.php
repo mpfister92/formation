@@ -59,4 +59,6 @@ abstract class MembersManager extends Manager {
 	abstract public function getLoginMemberFromId($id);
 	
 	abstract public function getStatusMemberFromId( $id );
+	
+	abstract public function getNewsAndCommentUsingMemberId_a($id_member);
 }

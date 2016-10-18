@@ -52,5 +52,6 @@
 		<script src="/js/add-comment.js"></script>
 		<script src="/js/jquery.jrumble.1.3.min.js"></script>
 		<script src="/js/refresh-news-page.js"></script>
+		<script src="/js/delete-comment.js"></script>
 	</body>
 </html>

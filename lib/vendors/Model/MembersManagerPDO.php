@@ -160,4 +160,51 @@ class MembersManagerPDO extends MembersManager {
 		
 		return $requete->fetchColumn();
 	}
+	
+	/**
+	 * retourne un tableau de news pour un membre avec les commentaire
+	 * associés écrit par ce membre
+	 * @param $id_member
+	 *
+	 * @return News[]
+	 */
+	public function getNewsAndCommentUsingMemberId_a($id_member){
+		$sql = 'SELECT *
+				FROM t_new_newsc 
+				LEFT OUTER JOIN t_new_commentc ON NCC_fk_NNC = NNC_id AND NCC_fk_NCE = :state_comment AND NCC_fk_NMC = :id_member
+				WHERE (NCC_fk_NMC = :id_member
+				OR NNC_fk_NMC = :id_member)
+				AND NNC_fk_NNE = :state_news';
+		
+		$requete = $this->_dao->prepare($sql);
+		$requete->bindValue(':id_member',$id_member,\PDO::PARAM_INT);
+		$requete->bindValue(':state_comment',CommentsManager::COMMENT_STATE_VALID,\PDO::PARAM_INT);
+		$requete->bindValue(':state_news',NewsManager::NEWS_STATE_VALID,\PDO::PARAM_INT);
+	
+		$requete->execute();
+		
+		$News_a = [];
+		while ($result = $requete->fetch(\PDO::FETCH_ASSOC)){
+			if(!key_exists($result['NNC_id'],$News_a)){
+				$News_a[$result['NNC_id']] = [
+					'id' => $result['NNC_id'],
+					'fk_NMC' => $result['NNC_fk_NMC'],
+					'titre' => $result['NNC_titre'],
+					'contenu' => $result['NNC_contenu'],
+					'dateAjout' => $result['NNC_dateAjout'],
+					'dateModif' => $result['NNC_dateModif'],
+					'comments' => []
+				];
+			}
+			if(null != $result['NCC_id']){
+				$News_a[$result['NNC_id']]['comments'][$result['NCC_id']] = [
+					'id_comment' => $result['NCC_id'],
+					'contenu_comment' => $result['NCC_contenu'],
+					'date_comment' => $result['NCC_date'],
+					'date_last_update' => $result['NCC_datemodif']
+				];
+			}
+		}
+		return $News_a;
+	}
 }

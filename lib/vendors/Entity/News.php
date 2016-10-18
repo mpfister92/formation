@@ -12,7 +12,7 @@ namespace Entity;
 use \OCFram\Entity;
 
 class News extends Entity {
-	protected $fk_NMC, $titre, $contenu, $dateAjout, $dateModif, $fk_NNE, $Member;
+	protected $id, $fk_NMC, $titre, $contenu, $dateAjout, $dateModif, $fk_NNE, $Member;
 	const AUTEUR_INVALIDE  = 1;
 	const TITRE_INVALIDE   = 2;
 	const CONTENU_INVALIDE = 3;

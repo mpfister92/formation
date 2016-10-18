@@ -4,7 +4,7 @@
  */
 ?>
 
-<p>Par <em><?= $news_author ?></em>, le <?= $News[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?></p>
+<p>Par <a href="<?= $News['link_auteur'] ?>"><em><?= $news_author ?></em></a>, le <?= $News[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?></p>
 <h2><?= $News[ 'titre' ] ?></h2>
 <p><?= nl2br( $News[ 'contenu' ] ) ?></p>
 
@@ -35,12 +35,12 @@
 			<legend>
 				Posté par
 				<strong>
-					<?= $Comment[ 'auteur' ] ?>
+					<a href="<?= $News['link_auteur'] ?>"><?= $Comment[ 'auteur' ] ?></a>
 				</strong>
 				le <?= $Comment[ 'date_formated' ] ?>
 				<?php if ( isset( $Comment[ 'link_update' ] ) && ( isset( $Comment[ 'link_delete' ] ) ) ): ?>
-					<a class="js-update-url" href="<?= $Comment[ 'link_update' ] ?>" data-update-url="<?= $for_update_comment_url ?>">Modifier</a> -
-					<a class="js-delete-url" href="<?= $Comment[ 'link_delete' ] ?>" data-update-url="<?= $for_delete_comment_url ?>">Supprimer</a>
+					<a class="js-update-url" href="<?= $Comment[ 'link_update' ] ?>" >Modifier</a> -
+					<a name="delete" id-comment="<?= $Comment['id'] ?>" delete-url="<?= $for_delete_comment_url ?>">Supprimer</a>
 				<?php endif; ?>
 			</legend>
 			<p class="contenu"><?= nl2br( htmlspecialchars( $Comment[ 'contenu' ] ) ) ?></p>

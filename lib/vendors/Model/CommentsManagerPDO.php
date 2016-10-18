@@ -53,20 +53,25 @@ class CommentsManagerPDO extends CommentsManager {
 	 *
 	 * @return Comment[]
 	 */
-	public function getListOf( $News, $Comment_date = null ) {
+	public function getListOf( $News, $Comment_date = null, $state = null) {
 		$sql = 'SELECT NCC_id AS id,NCC_fk_NNC AS fk_NNC,NCC_auteur AS auteur,NCC_contenu AS contenu,NCC_date AS date, NCC_fk_NCE AS fk_NCE, NCC_fk_NMC AS fk_NMC, NCC_datemodif AS dateModif 
                 FROM t_new_commentc
-                WHERE NCC_fk_NNC = :news
-                AND NCC_fk_NCE = :state';
+                WHERE NCC_fk_NNC = :news';
+		
+		if(null != $state){
+			$sql .= ' AND NCC_fk_NCE = :state';
+		}
 		
 		if ( null != $Comment_date ) {
-			$sql .= ' AND NCC_datemodif > :date
-					ORDER BY dateModif';
+			$sql .= ' AND NCC_datemodif > :date AND NCC_datemodif < NOW()
+					ORDER BY dateModif ASC';
 		}
 		
 		$requete = $this->_dao->prepare( $sql );
 		$requete->bindValue( ':news', $News, \PDO::PARAM_INT );
-		$requete->bindValue( ':state', self::COMMENT_STATE_VALID );
+		if(null != $state) {
+			$requete->bindValue( ':state', $state );
+		}
 		if ( null != $Comment_date ) {
 			$requete->bindValue( ':date', $Comment_date );
 		}
@@ -227,5 +232,45 @@ class CommentsManagerPDO extends CommentsManager {
 		$requete->execute();
 		
 		return $requete->fetchColumn();
+	}
+	
+	public function getListOfCommentsForMember($id_member){
+		$sql = 'SELECT NCC_id AS id,NCC_fk_NNC AS fk_NNC,NCC_auteur AS auteur,NCC_contenu AS contenu,NCC_date AS date, NCC_fk_NCE AS fk_NCE, NCC_fk_NMC AS fk_NMC, NCC_datemodif AS dateModif
+				FROM t_new_commentc
+				WHERE NCC_fk_NMC = :id_member
+				AND NCC_fk_NCE = :state';
+		
+		$requete = $this->_dao->prepare($sql);
+		$requete->bindValue(':id_member',$id_member,\PDO::PARAM_INT);
+		$requete->bindValue(':state',self::COMMENT_STATE_VALID);
+		
+		$requete->execute();
+		
+		$requete->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\Comment' );
+		
+		$Comments_a = $requete->fetchAll();
+		
+		foreach ( $Comments_a as $Comment ) {
+			$Comment->setDate( new \DateTime( $Comment->date() ) );
+			$Comment->setDateModif( new \DateTime( $Comment->dateModif() ) );
+		}
+		
+		return $Comments_a;
+	}
+	
+	public function getlistCommentForNewsAndIdMember($id_news, $id_member){
+		$sql = 'SELECT NCC_id AS id,NCC_fk_NNC AS fk_NNC,NCC_auteur AS auteur,NCC_contenu AS contenu, NCC_fk_NMC AS fk_NMC, NCC_datemodif AS datemodif
+				FROM t_new_commentc
+				WHERE NCC_fk_NMC = :id_member
+				AND NCC_fk_NNC = :id_news';
+		
+		$requete = $this->_dao->prepare($sql);
+		$requete->bindValue(':id_member',$id_member);
+		$requete->bindValue(':id_news',$id_news);
+		
+		$requete->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\Comment' );
+		$comment = $requete->fetch();
+		
+		return $comment;
 	}
 }

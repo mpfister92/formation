@@ -10,8 +10,6 @@ $( document ).ready( function() {
 		var $contenu = $current_form.find( 'textarea' );
 		var $valid   = $current_form.find( '.js-valid' );
 		
-		refresh();
-		
 		var p_data = {
 			contenu : $contenu.val()
 		};
@@ -21,6 +19,8 @@ $( document ).ready( function() {
 		if ( 1 === $auteur.length ) {
 			p_data.auteur = $auteur.val();
 		}
+		
+		refresh();
 		
 		$.ajax( {
 			type     : "POST",
@@ -44,6 +44,7 @@ $( document ).ready( function() {
 						});
 					return;
 				}
+				
 				//si l'insertion a réussi, on insère le commentaire et on affiche un message de validation
 				$contenu.css( {
 					borderColor : '#eee'
@@ -55,8 +56,8 @@ $( document ).ready( function() {
 				var $last_fieldset = $('fieldset:last');
 				var $coments_a = $('.js-comment-list');
 				
-				if($last_fieldset.length) {
-					$last_fieldset.after( comment_buildCommentHTMLRendering( data.content.comment ) );
+				if($( 'fieldset:last' ).length) {
+					$( 'fieldset:last' ).after( comment_buildCommentHTMLRendering( data.content.comment ) );
 				}
 				else{
 					$coments_a.append(comment_buildCommentHTMLRendering(data.content.comment));
@@ -81,17 +82,19 @@ $( document ).ready( function() {
 } );
 
 function comment_buildCommentHTMLRendering( comment ) {
-	return $( '<fieldset></fieldset>' ).attr('id',comment.id)
+	return $( '<fieldset></fieldset>' ).attr('id-comment',comment.id)
 		.append( $( '<legend></legend>' )
-			.append( 'Posté par ', $( '<strong></strong>' ).text( comment.auteur ), ' le ' + comment.date + ' ' )
+			.append( 'Posté par ', ($( '<strong></strong>' ).append($('<a></a>').attr('href',comment.summary_link).text( comment.auteur ))), ' le ' + comment.date + ' ' )
 			.append( comment.link_update ? $( '<a></a>' )
+				.addClass("js-update-url")
 				.attr( "href", comment.link_update )
 				.text( 'Modifier' ) : '', comment.link_update && comment.link_delete ? ' - ' : '', comment.link_delete ? $( '<a></a>' )
-				.attr( "href", comment.link_delete )
+				.attr("name","delete")
+				.attr("id-comment",comment.id)
+				.attr("delete-url" , comment.link_delete )
 				.text( 'Supprimer' ) : '' ), $( '<p></p>' )
 			.text( comment.contenu ) );
 }
-
 
 var $submit_field = $('[name=submit]');
 $submit_field.on('mouseover',function(clic){
