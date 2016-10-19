@@ -54,9 +54,9 @@ abstract class CommentsManager extends Manager {
 	
 	/** supprime les commentaires d'une news
 	 *
-	 * @param News $News
+	 * @param int $news_id
 	 */
-	abstract public function deleteFromNews( News $News );
+	abstract public function deleteFromNews( $news_id );
 	
 	/** determine la méthode a appeler (ajouter/modifier) selon le commentaire
 	 *

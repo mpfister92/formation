@@ -65,19 +65,19 @@ abstract class MembersManager extends Manager {
 	
 	/**
 	 * retourne le login d'un membre en fonction de son id
-	 * @param int $id
+	 * @param int $id_member
 	 *
 	 * @return string
 	 */
-	abstract public function getLoginMemberFromId($id);
+	abstract public function getLoginMemberFromId($id_member);
 	
 	/**
 	 * retourne le statut d'un membre en fonction de son id
-	 * @param int $id
+	 * @param int $id_member
 	 *
 	 * @return int
 	 */
-	abstract public function getStatusMemberFromId( $id );
+	abstract public function getStatusMemberFromId( $id_member );
 	
 	/**
 	 * retourne un tableau de news pour un membre avec les commentaire

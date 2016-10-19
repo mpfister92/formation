@@ -20,7 +20,7 @@ class Comment extends Entity {
 	 * @return bool
 	 */
 	public function isValid() {
-		return !(empty( $this->contenu ));
+		return !(empty( $this->contenu ) || (empty($this->auteur) && empty($this->fk_NMC)));
 	}
 	
 	/** SETTERS */

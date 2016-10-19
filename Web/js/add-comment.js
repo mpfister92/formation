@@ -3,6 +3,8 @@ $( document ).ready( function() {
 	var $form = $( '.js-form-comment-news' );
 	
 	$form.on( 'submit', function( event ) {
+		console.log('ba');
+		
 		var $current_form = $( this );
 		
 		var $champ_a = $current_form.find( '[name=auteur],textarea' );
@@ -28,6 +30,7 @@ $( document ).ready( function() {
 			data     : p_data,
 			dataType : 'json',
 			success  : function( data ) {
+				console.log(data);
 				//si l'insertion a échoué, on affiche le message d'erreur correspondant et on indique
 				//le champ qui a provoqué l'erreur
 				if ( false === data.content.success ) {

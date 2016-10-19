@@ -149,16 +149,16 @@ class CommentsManagerPDO extends CommentsManager {
 	
 	/** supprime les commentaires d'une news
 	 *
-	 * @param News $News
+	 * @param int $news_id
 	 */
-	public function deleteFromNews( News $News ) {
+	public function deleteFromNews( $news_id ) {
 		$sql = 'UPDATE t_new_commentc SET
 					NCC_fk_NCE = :state,
 					NCC_datemodif = NOW()
                 WHERE NCC_fk_NNC = :news';
 		
 		$request = $this->_dao->prepare( $sql );
-		$request->bindValue( ':news', (int)$News, \PDO::PARAM_INT );
+		$request->bindValue( ':news', (int)$news_id, \PDO::PARAM_INT );
 		$request->bindValue( ':state', self::COMMENT_STATE_INVALID );
 		
 		$request->execute();

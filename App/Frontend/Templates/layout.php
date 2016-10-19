@@ -29,7 +29,7 @@
 				<ul id="menu">
 					<?php if ( isset( $menu ) ): ?>
 						<?php foreach ( $menu as $key => $value ): ?>
-							<li class="second-level"><a href="<?= $value ?>"><?= $key ?></a></li>
+							<li><a href="<?= $value ?>"><?= $key ?></a></li>
 						<?php endforeach; ?>
 					<?php endif; ?>
 				</ul>

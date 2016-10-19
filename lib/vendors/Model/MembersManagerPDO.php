@@ -143,17 +143,17 @@ class MembersManagerPDO extends MembersManager {
 	
 	/**
 	 * retourne le login d'un membre en fonction de son id
-	 * @param int $id
+	 * @param int $id_member
 	 *
 	 * @return string
 	 */
-	public function getLoginMemberFromId( $id ) {
+	public function getLoginMemberFromId( $id_member ) {
 		$sql = 'SELECT NMC_login AS login
 				FROM t_new_memberc
 				WHERE NMC_id = :id';
 		
 		$requete = $this->_dao->prepare( $sql );
-		$requete->bindValue( ':id', $id, \PDO::PARAM_INT );
+		$requete->bindValue( ':id', $id_member, \PDO::PARAM_INT );
 		
 		$requete->execute();
 		
@@ -162,17 +162,17 @@ class MembersManagerPDO extends MembersManager {
 	
 	/**
 	 * retourne le statut d'un membre en fonction de son id
-	 * @param int $id
+	 * @param int $id_member
 	 *
 	 * @return int
 	 */
-	public function getStatusMemberFromId( $id ) {
+	public function getStatusMemberFromId( $id_member ) {
 		$sql = 'SELECT NMC_fk_NMY AS fk_NMY
 				FROM t_new_memberc
 				WHERE NMC_id = :id';
 		
 		$requete = $this->_dao->prepare( $sql );
-		$requete->bindValue( ':id', $id, \PDO::PARAM_INT );
+		$requete->bindValue( ':id', $id_member, \PDO::PARAM_INT );
 		
 		$requete->execute();
 		
