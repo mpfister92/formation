@@ -34,6 +34,7 @@ class Page extends ApplicationComponent {
 	}
 	
 	public function getGeneratedPageHTML() {
+		header('Content-Type: text/html; charset=utf-8');
 		$user = $this->_app->user();
 		
 		//créé des variables à partir d'un tableau associatif

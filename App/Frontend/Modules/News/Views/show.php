@@ -4,7 +4,7 @@
  */
 ?>
 
-<p>Par <a href="<?= $News['link_auteur'] ?>"><em><?= $news_author ?></em></a>, le <?= $News[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?></p>
+<p>Par <a href="<?= $News['link_auteur'] ?>"><em><?= $news_author ?></em></a>,le <?= $News[ 'dateAjout' ]->format( 'd/m/Y à H\hi' ) ?></p>
 <h2><?= $News[ 'titre' ] ?></h2>
 <p><?= nl2br( $News[ 'contenu' ] ) ?></p>
 
@@ -35,7 +35,11 @@
 			<legend>
 				Posté par
 				<strong>
-					<a href="<?= $News['link_auteur'] ?>"><?= $Comment[ 'auteur' ] ?></a>
+					<?php if (isset($Comment['link_summary'])): ?>
+						<a href="<?= $Comment['link_summary'] ?>"><?= $Comment[ 'auteur' ] ?></a>
+					<?php else: ?>
+						<strong><?= $Comment[ 'auteur' ] ?></strong>
+					<?php endif; ?>
 				</strong>
 				le <?= $Comment[ 'date_formated' ] ?>
 				<?php if ( isset( $Comment[ 'link_update' ] ) && ( isset( $Comment[ 'link_delete' ] ) ) ): ?>

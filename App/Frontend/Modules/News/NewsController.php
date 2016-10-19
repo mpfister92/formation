@@ -74,7 +74,11 @@ class NewsController extends BackController {
 			$this->addLinksUpdateDeleteToComment($Comment);
 			$this->_page->addVar('for_update_comment_url',$this->app()->router()->provideRoute('Backend','News','updateCommentAjax',['id' => $Comment['id']]));
 			$this->_page->addVar('for_delete_comment_url',$this->app()->router()->provideRoute('Backend','News','deleteCommentAjax',['id' => $Comment['id']]));
-		
+			
+			//lien vers le résumé de l'auteur du commentaire
+			if(null != $Comment['fk_NMC']) {
+				$Comment->link_summary = $this->app()->router()->provideRoute( 'Frontend', 'News', 'getSummaryMember', [ 'id' => $Comment[ 'fk_NMC' ] ] );
+			}
 		}
 		
 		$formBuilder = new CommentFormBuilder( new Comment() );
@@ -97,7 +101,6 @@ class NewsController extends BackController {
 		$last_update_date = $this->_managers->getManagerOf('Comments')->getMaxEditionDate();
 		$this->_page->addVar('last_update_date',$last_update_date);
 		
-		//lien vers le résumé de l'auteur
 		$News->link_auteur = $this->app()->router()->provideRoute('Frontend','News','getSummaryMember',['id' => $News['fk_NMC']]);
 	}
 	
@@ -107,7 +110,7 @@ class NewsController extends BackController {
 	private function addLinksUpdateDeleteToComment(Comment $Comment){
 		
 		//nom de l'auteur de la news
-		$news_author = $this->_managers->getManagerOf('Comments')->getNewsAuthorFromIdComment($Comment['id']);
+		$news_author = $this->_managers->getManagerOf('Comments')->getNewsAuthorUsingIdComment($Comment['id']);
 		
 		//recuperation du login de l'auteur du commentaire
 		if ( $Comment[ 'fk_NMC' ] != null ) {
@@ -155,7 +158,7 @@ class NewsController extends BackController {
 					'fk_NNC'  => $Request->getData( 'news' ),
 					'contenu' => $Request->postData( 'contenu' ),
 				] );
-				$Comment->setFk_NMC( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
+				$Comment->setFk_NMC( $this->_managers->getManagerOf( 'Members' )->getIdMemberUsingLogin( $this->getUser()->getLogin() ) );
 			}
 		}
 		else {
@@ -269,6 +272,10 @@ class NewsController extends BackController {
 		$this->_page->addVar( 'Comments_a', $Comments_a );
 	}
 	
+	/** action permettant de générer la page de résumé d'un membre : toutes ses news + ses commentaires et les news associées
+	 * @param HTTPRequest $Request
+	 *
+	 */
 	public function executeGetSummaryMember(HTTPRequest $Request){
 		$this->run();
 		
@@ -286,6 +293,8 @@ class NewsController extends BackController {
 			$date_formated_modif_news = $dateModif_news->format( 'd/m/Y à H\hi' );
 			$News_a[$News['id']]['dateAjout'] = $date_formated_ajout_news;
 			$News_a[$News['id']]['dateModif'] = $date_formated_modif_news;
+			$News_a[$News['id']]['link_news'] = $this->app()->router()->provideRoute('Frontend','News','show',['id' => $News['id']]);
+			$News_a[$News['id']]['link_summary'] = $this->app()->router()->provideRoute('Frontend','News','getSummaryMember',['id' => $News['fk_NMC']]);
 			
 			foreach ($News['comments'] as $Comment){
 				$dateAjout_comment = new \DateTime($Comment['date_comment']);
@@ -294,13 +303,13 @@ class NewsController extends BackController {
 				$date_formated_modif_comment = $dateModif_comment->format( 'd/m/Y à H\hi' );
 				$News_a[$News['id']]['comments'][$Comment['id_comment']]['date_comment'] = $date_formated_ajout_comment;
 				$News_a[$News['id']]['comments'][$Comment['id_comment']]['date_last_update'] = $date_formated_modif_comment;
-//				var_dump($Comment);die();
 			}
 			
 		}
 		
+		$this->_page->addVar('number_news',$this->_managers->getManagerOf('News')->countNews($id_member));
+		$this->_page->addVar('number_comments',$this->_managers->getManagerOf('Members')->countNumberCommentUsingIdMember($id_member));
 		$this->_page->addVar('News_a',$News_a);
 		$this->_page->addVar('login_member',$login_member);
-//		var_dump($News_a['58']);die();
 	}
 }

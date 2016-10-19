@@ -5,21 +5,21 @@ namespace Model;
 use \Entity\News;
 
 class NewsManagerPDO extends NewsManager {
-	/** retourne la liste des news pour un auteur $news
+	/** retourne une liste de news
 	 *
 	 * @param int    $debut
 	 * @param int    $limite
-	 * @param string $name
+	 * @param int $id_member
 	 *
 	 * @return News[]
 	 */
-	public function getList( $debut = -1, $limite = -1, $id = null ) {
+	public function getList( $debut = -1, $limite = -1, $id_member = null ) {
 		
 		$sql = 'SELECT NNC_id AS id,NNC_fk_NMC AS fk_NMC,NNC_titre AS titre,NNC_contenu AS contenu,NNC_dateAjout AS dateAjout,NNC_dateModif AS dateModif, NNC_fk_NNE as fk_NNE
 				FROM t_new_newsc
 				WHERE NNC_fk_NNE = :state';
 		
-		if ( $id != null ) {
+		if ( $id_member != null ) {
 			$sql .= ' AND NNC_fk_NMC = :id';
 		}
 		
@@ -28,8 +28,8 @@ class NewsManagerPDO extends NewsManager {
 		}
 		
 		$requete = $this->_dao->prepare( $sql );
-		if ( null !== $id ) {
-			$requete->bindValue( ':id', $id );
+		if ( null !== $id_member ) {
+			$requete->bindValue( ':id', $id_member );
 		}
 		$requete->bindValue( ':state', parent::NEWS_STATE_VALID, \PDO::PARAM_INT );
 		$requete->execute();
@@ -52,17 +52,17 @@ class NewsManagerPDO extends NewsManager {
 	
 	/** renvoie la news liée à l'id passé en paramètre
 	 *
-	 * @param int $id
+	 * @param int $id_news
 	 *
 	 * @return News
 	 */
-	public function getNews( $id ) {
+	public function getNews( $id_news ) {
 		$sql = 'SELECT NNC_id AS id,NNC_fk_NMC AS fk_NMC,NNC_titre AS titre,NNC_contenu AS contenu,NNC_dateAjout AS dateAjout,NNC_dateModif AS dateModif
                 FROM t_new_newsc
                 WHERE NNC_id = :id';
 		
 		$requete = $this->_dao->prepare( $sql );
-		$requete->bindValue( ':id', (int)$id, \PDO::PARAM_INT );
+		$requete->bindValue( ':id', (int) $id_news, \PDO::PARAM_INT );
 		$requete->execute();
 		
 		$requete->setFetchMode( \PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Entity\News' );
@@ -78,24 +78,24 @@ class NewsManagerPDO extends NewsManager {
 		return null;
 	}
 	
-	/** retourne le nombre de news dans la base
+	/** retourne le nombre de news dans la base (optionnel : pour un membre)
 	 *
-	 * @param string $name
+	 * @param int $id_member
 	 *
 	 * @return int
 	 */
-	public function countNews( $id = null ) {
+	public function countNews( $id_member = null ) {
 		$sql = 'SELECT COUNT(*)
                 FROM t_new_newsc
                 WHERE NNC_fk_NNE = :state';
 		
-		if ( isset($id ) ) {
+		if ( isset($id_member ) ) {
 			$sql .= ' AND NNC_fk_NMC = :id';
 		}
 		
 		$requete = $this->_dao->prepare( $sql );
-		if(null !== $id) {
-			$requete->bindValue( ':id', $id );
+		if(null !== $id_member) {
+			$requete->bindValue( ':id', $id_member );
 		}
 		$requete->bindValue( ':state', parent::NEWS_STATE_VALID);
 		$requete->execute();
@@ -106,7 +106,7 @@ class NewsManagerPDO extends NewsManager {
 	
 	/** ajoute une news dans la base
 	 *
-	 * @param News $news
+	 * @param News $News
 	 */
 	protected function add( News $News ) {
 		$sql = 'INSERT INTO t_new_newsc SET 
@@ -128,7 +128,7 @@ class NewsManagerPDO extends NewsManager {
 	
 	/** update une news de la base
 	 *
-	 * @param News $news
+	 * @param News $News
 	 */
 	protected function modify( News $News ) {
 		$sql = 'UPDATE t_new_newsc SET 
@@ -149,34 +149,34 @@ class NewsManagerPDO extends NewsManager {
 	
 	/** supprime une news de la base
 	 *
-	 * @param int $id
+	 * @param int $id_news
 	 */
-	public function delete( $id ) {
+	public function delete( $id_news ) {
 		$sql = 'UPDATE t_new_newsc SET
 					NNC_fk_NNE = :state
 				WHERE NNC_id = :id';
 		
 		$requete = $this->_dao->prepare($sql);
 		$requete->bindValue(':state',parent::NEWS_STATE_INVALID);
-		$requete->bindValue(':id',$id,\PDO::PARAM_INT);
+		$requete->bindValue(':id',$id_news,\PDO::PARAM_INT);
 		
 		$requete->execute();
 	}
 	
 	/** retourne le login de la personne qui a écrit la news
 	 *
-	 * @param int $id
+	 * @param int $id_news
 	 *
 	 * @return string $result
 	 */
-	public function getLoginFromNewsId( $id ) {
+	public function getLoginFromNewsId( $id_news ) {
 		$sql = 'SELECT NMC_login
 				FROM t_new_newsc
 				INNER JOIN t_new_memberc ON NMC_id = NNC_fk_NMC
 				WHERE NNC_id = :id';
 		
 		$requete = $this->_dao->prepare( $sql );
-		$requete->bindValue( 'id', $id, \PDO::PARAM_INT );
+		$requete->bindValue( 'id', $id_news, \PDO::PARAM_INT );
 		
 		$requete->execute();
 		

@@ -122,7 +122,13 @@ class MembersManagerPDO extends MembersManager {
 		$requete->execute();
 	}
 	
-	public function getIdMemberFromLogin( $login ) {
+	/**
+	 * retourne l'id d'un membre a partir de son login
+	 * @param $login
+	 *
+	 * @return int
+	 */
+	public function getIdMemberUsingLogin( $login ) {
 		$sql = 'SELECT NMC_id AS id
 				FROM t_new_memberc
 				WHERE NMC_login = :login';
@@ -135,6 +141,12 @@ class MembersManagerPDO extends MembersManager {
 		return ( $requete->fetchColumn() );
 	}
 	
+	/**
+	 * retourne le login d'un membre en fonction de son id
+	 * @param int $id
+	 *
+	 * @return string
+	 */
 	public function getLoginMemberFromId( $id ) {
 		$sql = 'SELECT NMC_login AS login
 				FROM t_new_memberc
@@ -148,6 +160,12 @@ class MembersManagerPDO extends MembersManager {
 		return $requete->fetchColumn();
 	}
 	
+	/**
+	 * retourne le statut d'un membre en fonction de son id
+	 * @param int $id
+	 *
+	 * @return int
+	 */
 	public function getStatusMemberFromId( $id ) {
 		$sql = 'SELECT NMC_fk_NMY AS fk_NMY
 				FROM t_new_memberc
@@ -206,5 +224,45 @@ class MembersManagerPDO extends MembersManager {
 			}
 		}
 		return $News_a;
+	}
+	
+	/** retourne le nombre de news écrite par un membre
+	 * @param int $id_member
+	 * @return int
+	 */
+	public function countNumberNewsUsingIdMember($id_member){
+		$sql = 'SELECT COUNT(*)
+				FROM t_new_newsc
+				WHERE NNC_fk_NMC = :id_member
+				AND NNC_fk_NNE = :state';
+		
+		$requete = $this->_dao->prepare($sql);
+		$requete->bindValue(':id_member',$id_member,\PDO::PARAM_INT);
+		$requete->bindValue(':state',NewsManager::NEWS_STATE_VALID,\PDO::PARAM_INT);
+		
+		$requete->execute();
+		
+		return $requete->fetchColumn();
+	}
+	
+	/**
+	 * retourne le nombre de commentaires écrits par un membre
+	 * @param int $id_member
+	 *
+	 * @return int
+	 */
+	public function countNumberCommentUsingIdMember($id_member){
+		$sql = 'SELECT COUNT(*)
+				FROM t_new_commentc
+				WHERE NCC_fk_NMC = :id_member
+				AND NCC_fk_NCE = :state';
+		
+		$requete = $this->_dao->prepare($sql);
+		$requete->bindValue(':id_member',$id_member);
+		$requete->bindValue(':state',CommentsManager::COMMENT_STATE_VALID);
+		
+		$requete->execute();
+		
+		return $requete->fetchColumn();
 	}
 }

@@ -8,6 +8,7 @@
 
 namespace Model;
 
+use Entity\News;
 use \OCFram\Manager;
 use \Entity\Member;
 
@@ -54,11 +55,50 @@ abstract class MembersManager extends Manager {
 		}
 	}
 	
-	abstract public function getIdMemberFromLogin($login);
+	/**
+	 * retourne l'id d'un membre a partir de son login
+	 * @param $login
+	 *
+	 * @return int
+	 */
+	abstract public function getIdMemberUsingLogin($login);
 	
+	/**
+	 * retourne le login d'un membre en fonction de son id
+	 * @param int $id
+	 *
+	 * @return string
+	 */
 	abstract public function getLoginMemberFromId($id);
 	
+	/**
+	 * retourne le statut d'un membre en fonction de son id
+	 * @param int $id
+	 *
+	 * @return int
+	 */
 	abstract public function getStatusMemberFromId( $id );
 	
+	/**
+	 * retourne un tableau de news pour un membre avec les commentaire
+	 * associés écrit par ce membre
+	 * @param $id_member
+	 *
+	 * @return News[]
+	 */
 	abstract public function getNewsAndCommentUsingMemberId_a($id_member);
+	
+	/**
+	 * retourne le nombre de commentaires écrits par un membre
+	 * @param int $id_member
+	 *
+	 * @return int
+	 */
+	abstract public function countNumberCommentUsingIdMember($id_member);
+	
+	/** retourne le nombre de news écrite par un membre
+	 * @param int $id_member
+	 * @return int
+	 */
+	abstract public function countNumberNewsUsingIdMember($id_member);
 }

@@ -13,8 +13,13 @@ $('body').on( 'click','a[name=delete]', function() {
 		},
 		dataType : 'json',
 		success  : function( data ) {
+			//si succès, on supprime le commentaire
 			if ( true === data.content.success ) {
 				$( 'fieldset[id-comment=' + data.content.comment.id + ']' ).remove();
+			}
+			//si on supprime le dernier commentaire on réaffiche le message
+			if($('fieldset:last').length == 0){
+				$('.js-exists-comment').html("Aucun commentaire n'a encore été posté. Soyez le premier à en laisser un !");
 			}
 		}
 	});

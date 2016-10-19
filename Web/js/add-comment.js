@@ -84,7 +84,7 @@ $( document ).ready( function() {
 function comment_buildCommentHTMLRendering( comment ) {
 	return $( '<fieldset></fieldset>' ).attr('id-comment',comment.id)
 		.append( $( '<legend></legend>' )
-			.append( 'Posté par ', ($( '<strong></strong>' ).append($('<a></a>').attr('href',comment.summary_link).text( comment.auteur ))), ' le ' + comment.date + ' ' )
+			.append( 'Posté par ', ($( '<strong></strong>' ).append(comment.summary_link ? $('<a></a>').attr('href',comment.summary_link).text( comment.auteur ) : comment.auteur)), ' le ' + comment.date + ' ' )
 			.append( comment.link_update ? $( '<a></a>' )
 				.addClass("js-update-url")
 				.attr( "href", comment.link_update )

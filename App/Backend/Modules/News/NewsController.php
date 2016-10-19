@@ -79,7 +79,7 @@ class NewsController extends BackController {
 					'titre'   => $Request->postData( 'titre' ),
 					'contenu' => $Request->postData( 'contenu' ),
 				] );
-				$News->setFk_NMC( $this->_managers->getManagerOf( 'Members' )->getIdMemberFromLogin( $this->getUser()->getLogin() ) );
+				$News->setFk_NMC( $this->_managers->getManagerOf( 'Members' )->getIdMemberUsingLogin( $this->getUser()->getLogin() ) );
 			}
 			
 			if ( $Request->getExists( 'id' ) ) {
@@ -190,7 +190,7 @@ class NewsController extends BackController {
 		if ( $Request->getExists( 'id' ) ) {
 			$id_comment  = $Request->getData( 'id' );
 			$Comment     = $this->_managers->getManagerOf( 'Comments' )->get( $id_comment );
-			$news_author = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
+			$news_author = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorUsingIdComment( $id_comment );
 			if ( null != $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment ) ) {
 				$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
 			}
@@ -229,7 +229,7 @@ class NewsController extends BackController {
 		
 		$id_comment  = $Request->getData( 'id' );
 		$Comment     = $this->_managers->getManagerOf( 'Comments' )->get( $id_comment );
-		$news_author = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
+		$news_author = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorUsingIdComment( $id_comment );
 		if ( null != $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment ) ) {
 			$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
 		}
@@ -260,7 +260,7 @@ class NewsController extends BackController {
 		
 		$id_comment  = $Request->postData( 'id_comment' );
 		$Comment     = $this->_managers->getManagerOf( 'Comments' )->get( $id_comment );
-		$news_author = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorFromIdComment( $id_comment );
+		$news_author = $this->_managers->getManagerOf( 'Comments' )->getNewsAuthorUsingIdComment( $id_comment );
 		if ( null != $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment ) ) {
 			$comment_author = $this->_managers->getManagerOf( 'Comments' )->getCommentAuthorFromId( $id_comment );
 		}
